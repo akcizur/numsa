@@ -14,6 +14,14 @@ import { BackToTop } from './components/BackToTop';
 gsap.registerPlugin(ScrollTrigger);
 
 export default function App() {
+  const [activeHud, setActiveHud] = useState({
+    idx: 0,
+    n: '00',
+    name: 'INTRO',
+    progress: 0,
+  });
+  const currentHudIndexRef = useRef(0);
+
   const [isDark, setIsDark] = useState<boolean>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('app_theme');
