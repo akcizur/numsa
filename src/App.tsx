@@ -5,19 +5,187 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import {
+  Zap,
+  Sparkles,
+  FolderGit2,
+  Package,
+  Download,
+  Share2,
   ExternalLink,
   Github,
   Twitter,
   Linkedin,
   Instagram,
+  Layers,
+  Sliders,
 } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { calculateWindowTransfer, getWindowScrollTarget } from './utils/windowTransitions';
 import { splitTextIntoChars } from './utils/splitText';
 import { BackToTop } from './components/BackToTop';
+import { FluentLazyMedia } from './components/FluentLazyMedia';
 
 gsap.registerPlugin(ScrollTrigger);
+
+type CategoryKey = 'projekty' | 'kits' | 'assets' | 'social';
+
+const CATEGORIES_DATA: Record<
+  CategoryKey,
+  {
+    title: string;
+    icon: any;
+    items: {
+      name: string;
+      tag: string;
+      desc: string;
+      href: string;
+      image: string;
+      external?: boolean;
+    }[];
+  }
+> = {
+  projekty: {
+    title: 'PROJEKTY',
+    icon: FolderGit2,
+    items: [
+      {
+        name: 'Edge Mist Studio',
+        tag: 'WEBGL / SHADER',
+        desc: 'Symmetric optical glass mist with bidirectional inertial velocity response.',
+        href: '#blur',
+        image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=700&q=80',
+      },
+      {
+        name: 'Living Grain Engine',
+        tag: '24FPS CANVAS',
+        desc: '6-frame cyclic 35mm film noise buffer with sub-pixel gate weave jitter.',
+        href: '#fade',
+        image: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&w=700&q=80',
+      },
+      {
+        name: 'Kinetic Parallax Lab',
+        tag: 'PHYSICS LERP',
+        desc: '0.09 quintic smoothing transfer function with zero center popping.',
+        href: '#gradient',
+        image: 'https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=700&q=80',
+      },
+      {
+        name: 'Glassmorphic 3D OS',
+        tag: 'EXPERIMENT',
+        desc: 'Full-bleed viewport edge refraction system with dynamic lighting.',
+        href: '#top',
+        image: 'https://images.unsplash.com/photo-1618005198919-d3d4b5a92ead?auto=format&fit=crop&w=700&q=80',
+      },
+    ],
+  },
+  kits: {
+    title: 'KITS',
+    icon: Package,
+    items: [
+      {
+        name: 'Inertial Scroll React Hook',
+        tag: 'NPM PACKAGE',
+        desc: 'Velocity dampening and wheel rate interpolator for React 19 apps.',
+        href: '#synthesis',
+        image: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=700&q=80',
+      },
+      {
+        name: 'GSAP Cinematic Lens Starter',
+        tag: 'STARTER KIT',
+        desc: 'Turnkey 3D headline typography extrusion with mask reveal timelines.',
+        href: '#blur',
+        image: 'https://images.unsplash.com/photo-1508739773434-c26b3d09e071?auto=format&fit=crop&w=700&q=80',
+      },
+      {
+        name: 'Living 35mm Grain Buffer',
+        tag: 'CANVAS UTILS',
+        desc: 'Half-res double-buffered noise generator with custom opacity curves.',
+        href: '#fade',
+        image: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=700&q=80',
+      },
+      {
+        name: 'Tailwind Symmetric Glass Preset',
+        tag: 'CSS MODULE',
+        desc: 'Ready-to-use backdrop-filter and mist diffusion utility classes.',
+        href: '#gradient',
+        image: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=700&q=80',
+      },
+    ],
+  },
+  assets: {
+    title: 'ASSETS',
+    icon: Download,
+    items: [
+      {
+        name: '6x Cyclic 35mm Noise Textures',
+        tag: 'TEXTURE PACK',
+        desc: 'Authentic high-resolution scanned film grain plates for canvas blending.',
+        href: '#fade',
+        image: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=700&q=80',
+      },
+      {
+        name: 'Dual Edge Mist SVG Alpha Masks',
+        tag: 'VECTOR ASSETS',
+        desc: 'Symmetric linear and radial gradient masks for glass diffusion edges.',
+        href: '#blur',
+        image: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=700&q=80',
+      },
+      {
+        name: 'GLSL Caustic & Mist Shaders',
+        tag: 'SHADERS',
+        desc: 'Real-time fragment shaders simulating optical lens dispersion.',
+        href: '#gradient',
+        image: 'https://images.unsplash.com/photo-1614741118887-7a4ee193a5fa?auto=format&fit=crop&w=700&q=80',
+      },
+      {
+        name: 'Figma Motion Design Tokens',
+        tag: 'FIGMA KIT',
+        desc: 'Quintic easing bezier curves, color palettes, and typographic scales.',
+        href: '#synthesis',
+        image: 'https://images.unsplash.com/photo-1558655146-d09347e92766?auto=format&fit=crop&w=700&q=80',
+      },
+    ],
+  },
+  social: {
+    title: 'SOC SÍTĚ',
+    icon: Share2,
+    items: [
+      {
+        name: 'GitHub',
+        tag: '@ruzickajakub',
+        desc: 'Open-source motion experiments, physics engines, and prototypes.',
+        href: 'https://github.com/ruzickajakub',
+        image: 'https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?auto=format&fit=crop&w=700&q=80',
+        external: true,
+      },
+      {
+        name: 'X / Twitter',
+        tag: '@ruzickajakub',
+        desc: 'Design engineering updates, kinetic motion snippets, and release logs.',
+        href: 'https://x.com/ruzickajakub',
+        image: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&w=700&q=80',
+        external: true,
+      },
+      {
+        name: 'LinkedIn',
+        tag: 'Jakub Růžička',
+        desc: 'Professional career background, design systems leadership, and contact.',
+        href: 'https://linkedin.com/in/ruzickajakub',
+        image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=700&q=80',
+        external: true,
+      },
+      {
+        name: 'Instagram',
+        tag: '@ruzickajakub',
+        desc: 'Visual exploration, typography in 3D space, and experimental motion reels.',
+        href: 'https://instagram.com/ruzickajakub',
+        image: 'https://images.unsplash.com/photo-1534972195531-a756b1126f24?auto=format&fit=crop&w=700&q=80',
+        external: true,
+      },
+    ],
+  },
+};
 
 export default function App() {
   const [isDark, setIsDark] = useState<boolean>(() => {
@@ -29,6 +197,10 @@ export default function App() {
     return true;
   });
 
+  const [activeCategory, setActiveCategory] = useState<CategoryKey>('projekty');
+  const [pulseCount, setPulseCount] = useState(0);
+  const [visualMousePos, setVisualMousePos] = useState({ x: 50, y: 35 });
+  const [isSurging, setIsSurging] = useState(false);
 
   const [activeHud, setActiveHud] = useState({
     idx: 0,
@@ -38,6 +210,27 @@ export default function App() {
   });
 
   const currentHudIndexRef = useRef(0);
+
+  const handleVisualMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    setVisualMousePos({ x: Math.round(x), y: Math.round(y) });
+  };
+
+  const triggerInertiaPulse = (power: number = 36) => {
+    setPulseCount((c) => c + 1);
+    setIsSurging(true);
+    setTimeout(() => setIsSurging(false), 650);
+    window.dispatchEvent(
+      new CustomEvent('trigger-inertia-pulse', {
+        detail: {
+          power,
+          category: activeCategory,
+        },
+      })
+    );
+  };
 
   // Toggle dark/light theme
   const toggleTheme = () => {
@@ -291,78 +484,34 @@ export default function App() {
         }
       });
 
-      // Full-window gallery driven by vertical scroll; collage proportions and captions travel sideways.
+      // Full-window horizontal gallery driven by vertical scroll, with each caption rising through a blurred edge.
       const projectGallery = document.querySelector<HTMLElement>('#synthesis .project-gallery');
       const projectTrack = document.querySelector<HTMLElement>('#synthesis .project-gallery__track');
       const projectPanels = gsap.utils.toArray<HTMLElement>('#synthesis .project-panel');
-      const projectInfoLayer = document.querySelector<HTMLElement>('.project-info-layer');
-      const projectTitleLayer = document.querySelector<HTMLElement>('.project-title-layer');
-      const projectInfoCards = gsap.utils.toArray<HTMLElement>('.project-info-layer .project-panel__info');
-      const projectTitleCards = gsap.utils.toArray<HTMLElement>('.project-title-layer .project-title');
       if (projectGallery && projectTrack && projectPanels.length) {
-        const mobileGallery = window.matchMedia('(max-width: 760px)').matches;
         const horizontalTween = gsap.to(projectTrack, {
           x: () => -(projectTrack.scrollWidth - projectGallery.clientWidth),
           ease: 'none',
           scrollTrigger: {
             trigger: projectGallery,
             start: 'top top',
-            // Give each collage more vertical scroll distance so its grid has time to reshape.
-            end: () => `+=${Math.max(1, projectTrack.scrollWidth - projectGallery.clientWidth) * 1.65}`,
-            scrub: 1,
-            pin: !mobileGallery,
+            end: () => `+=${Math.max(1, projectTrack.scrollWidth - projectGallery.clientWidth)}`,
+            scrub: 0.8,
+            pin: true,
             anticipatePin: 1,
             invalidateOnRefresh: true,
-            onToggle: (self) => {
-              if (projectInfoLayer) gsap.to(projectInfoLayer, { autoAlpha: self.isActive ? 1 : 0, duration: 0.24, overwrite: true });
-              if (projectTitleLayer) gsap.to(projectTitleLayer, { autoAlpha: self.isActive ? 1 : 0, duration: 0.24, overwrite: true });
-            },
           },
         });
-        if (mobileGallery) {
-          gsap.set(projectTrack, { clearProps: 'transform' });
-          if (projectInfoLayer) gsap.set(projectInfoLayer, { autoAlpha: 0 });
-          if (projectTitleLayer) gsap.set(projectTitleLayer, { autoAlpha: 0 });
-        }
         projectPanels.forEach((panel, index) => {
           const images = panel.querySelectorAll<HTMLElement>('.project-panel__collage img');
-          const collage = panel.querySelector<HTMLElement>('.project-panel__collage');
-          const info = projectInfoCards[index];
-          if (info) {
-            if (!mobileGallery) {
-              gsap.set(info, { xPercent: 110, yPercent: 0, autoAlpha: 0 });
-              const title = projectTitleCards[index];
-              if (title) gsap.set(title, { xPercent: 110, autoAlpha: 0 });
-              const previousInfo = projectInfoCards[index - 1];
-              const previousTitle = projectTitleCards[index - 1];
-              const captionTransition = gsap.timeline({
-                scrollTrigger: { trigger: panel, containerAnimation: horizontalTween, start: 'left 84%', end: 'left 34%', scrub: 0.8 },
-              });
-              if (previousInfo) captionTransition.to(previousInfo, { xPercent: -110, autoAlpha: 0, ease: 'power3.inOut' }, 0);
-              if (previousTitle) captionTransition.to(previousTitle, { xPercent: -110, autoAlpha: 0, ease: 'power3.inOut' }, 0);
-              captionTransition.to(info, { xPercent: 0, autoAlpha: 1, ease: 'power3.inOut' }, 0);
-              if (title) captionTransition.to(title, { xPercent: 0, autoAlpha: 1, ease: 'power3.inOut' }, 0);
-            } else {
-              gsap.fromTo(info, { autoAlpha: 0, y: 24 }, {
-                autoAlpha: 1, y: 0, duration: 0.7, ease: 'power3.out',
-                scrollTrigger: { trigger: panel, start: 'top 70%', toggleActions: 'play none none reverse' },
-              });
-            }
+          const info = panel.querySelector<HTMLElement>('.project-panel__info');
+          if (info && index > 0) {
+            gsap.fromTo(info.children, { yPercent: 120, filter: 'blur(16px)', autoAlpha: 0 }, {
+              yPercent: 0, filter: 'blur(0px)', autoAlpha: 1, stagger: 0.07, ease: 'power3.out',
+              scrollTrigger: { trigger: panel, containerAnimation: horizontalTween, start: 'left 82%', end: 'left 48%', scrub: 0.65 },
+            });
           }
-          if (images.length && !mobileGallery) {
-            const collageLayouts = [
-              { columns: '48% 22% 30%', rows: '46% 30% 24%' },
-              { columns: '23% 49% 28%', rows: '34% 38% 28%' },
-              { columns: '36% 22% 42%', rows: '39% 35% 26%' },
-              { columns: '28% 45% 27%', rows: '43% 33% 24%' },
-            ];
-            if (collage) {
-              gsap.fromTo(collage, collageLayouts[index % collageLayouts.length], {
-                ...collageLayouts[(index + 1) % collageLayouts.length],
-                ease: 'none',
-                scrollTrigger: { trigger: panel, containerAnimation: horizontalTween, start: 'left 88%', end: 'right 12%', scrub: 1.2 },
-              });
-            }
+          if (images.length) {
             const imageMoves = [
               { from: { xPercent: 0, yPercent: 7, scale: 1.03, rotation: 0 }, to: { xPercent: -4, yPercent: -5, scale: 1.17, rotation: 0 } },
               { from: { xPercent: 8, yPercent: -9, scale: 1.2, rotation: 1.1 }, to: { xPercent: -5, yPercent: 4, scale: 1.04, rotation: -0.35 } },
@@ -372,7 +521,7 @@ export default function App() {
               const move = imageMoves[imageIndex % imageMoves.length];
               gsap.fromTo(image, { ...move.from, transformOrigin: '50% 50%' }, {
                 ...move.to, ease: 'none',
-                scrollTrigger: { trigger: panel, containerAnimation: horizontalTween, start: 'left 88%', end: 'right 12%', scrub: 1.1 + imageIndex * 0.18 },
+                scrollTrigger: { trigger: panel, containerAnimation: horizontalTween, start: 'left right', end: 'right left', scrub: 1 + imageIndex * 0.18 },
               });
             });
           }
@@ -448,7 +597,7 @@ export default function App() {
 
   // Inertial scroll, velocity response, parallax, 4-window dynamic transfer, and living grain engine
   useEffect(() => {
-    document.title = 'RUZICKAJAKUB.cz — Webdesign, UI/UX a frontend';
+    document.title = 'Jakub Růžička - Cinematic Edge Motion · Living Grain';
 
     const rootEl = document.documentElement;
     const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -974,6 +1123,17 @@ export default function App() {
     window.addEventListener('resize', onResize, { passive: true });
     window.addEventListener('popstate', onPopState);
 
+    const onTriggerPulse = (e: Event) => {
+      const customDetail = (e as CustomEvent).detail || {};
+      const power = customDetail.power || 32;
+      velocity = Math.min(60, velocity + power);
+      edgeEnergy = 1.0;
+      edgeEnergyBottom = 0.95;
+      edgeEnergyTop = 0.95;
+      isIntertiaActive = true;
+      scheduleFrame();
+    };
+    window.addEventListener('trigger-inertia-pulse', onTriggerPulse);
 
     const onPageShow = () => {
       needsMeasure = true;
@@ -1002,6 +1162,7 @@ export default function App() {
       window.removeEventListener('resize', onResize);
       window.removeEventListener('popstate', onPopState);
       window.removeEventListener('pageshow', onPageShow);
+      window.removeEventListener('trigger-inertia-pulse', onTriggerPulse);
       scrollLinks.forEach((link) => link.removeEventListener('click', onAnchorClick as any));
     };
   }, [isDark]);
@@ -1168,19 +1329,19 @@ export default function App() {
             <div className="project-gallery" aria-label="Horizontální galerie projektů">
               <div className="project-gallery__track">
                 <article className="project-panel collage--a" id="project-blaak">
-                  <div className="project-panel__collage"><div className="collage-tile collage-main"><img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1800&q=85" alt="Barevná digitální kompozice" /></div><div className="collage-tile collage-detail"><img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1000&q=80" alt="Detail obrazovky" /></div><div className="collage-tile collage-accent"><img src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&w=1000&q=80" alt="Barevná textura" /></div></div>
+                  <div className="project-panel__collage"><div className="collage-tile collage-main"><img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1800&q=85" alt="Barevná digitální kompozice" /></div><div className="collage-tile collage-detail"><img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1000&q=80" alt="Detail obrazovky" /></div><div className="collage-tile collage-accent"><img src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&w=1000&q=80" alt="Barevná textura" /></div><div className="project-panel__info"><span className="eyebrow">01 / WEB — KATALOG</span><h3>GitGallery / BLaak</h3><p>Automatizovaný katalog webových projektů pro přehledné objevování a prezentaci.</p><a href="https://akcizur.github.io/blaak/" target="_blank" rel="noopener noreferrer">Otevřít projekt <ExternalLink size={16} /></a></div></div>
                   <span className="project-panel__count">01 <i /> 04</span>
                 </article>
                 <article className="project-panel collage--b" id="project-docs">
-                  <div className="project-panel__collage"><div className="collage-tile collage-main"><img src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&w=1800&q=85" alt="Barevná abstraktní textura" /></div><div className="collage-tile collage-detail"><img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1000&q=80" alt="Pracovní prostor" /></div><div className="collage-tile collage-accent"><img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1000&q=80" alt="Kód na obrazovce" /></div></div>
+                  <div className="project-panel__collage"><div className="collage-tile collage-main"><img src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&w=1800&q=85" alt="Barevná abstraktní textura" /></div><div className="collage-tile collage-detail"><img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1000&q=80" alt="Pracovní prostor" /></div><div className="collage-tile collage-accent"><img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1000&q=80" alt="Kód na obrazovce" /></div><div className="project-panel__info"><span className="eyebrow">02 / KNOWLEDGE WORKSPACE</span><h3>AKCIZUR Docs</h3><p>Dokumentace a pracovní informace propojené v jednom přehledném knowledge workspace.</p><a href="https://akcizur.github.io/docs/" target="_blank" rel="noopener noreferrer">Otevřít projekt <ExternalLink size={16} /></a></div></div>
                   <span className="project-panel__count">02 <i /> 04</span>
                 </article>
                 <article className="project-panel collage--c" id="project-panana">
-                  <div className="project-panel__collage"><div className="collage-tile collage-main"><img src="https://images.unsplash.com/photo-1618005198919-d3d4b5a92ead?auto=format&fit=crop&w=1800&q=85" alt="Abstraktní digitální obraz" /></div><div className="collage-tile collage-detail"><img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1000&q=80" alt="Skladový provoz" /></div><div className="collage-tile collage-accent"><img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1000&q=80" alt="Výrobní prostředí" /></div></div>
+                  <div className="project-panel__collage"><div className="collage-tile collage-main"><img src="https://images.unsplash.com/photo-1618005198919-d3d4b5a92ead?auto=format&fit=crop&w=1800&q=85" alt="Abstraktní digitální obraz" /></div><div className="collage-tile collage-detail"><img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1000&q=80" alt="Skladový provoz" /></div><div className="collage-tile collage-accent"><img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1000&q=80" alt="Výrobní prostředí" /></div><div className="project-panel__info"><span className="eyebrow">03 / SKLAD — VÝROBA</span><h3>Panana</h3><p>Nástroj pro řízení skladu a výroby s přehledným provozním workflow.</p><a href="https://github.com/akcizur/panana" target="_blank" rel="noopener noreferrer">Zobrazit na GitHubu <ExternalLink size={16} /></a></div></div>
                   <span className="project-panel__count">03 <i /> 04</span>
                 </article>
                 <article className="project-panel collage--d" id="project-dflat">
-                  <div className="project-panel__collage"><div className="collage-tile collage-main"><img src="https://images.unsplash.com/photo-1614741118887-7a4ee193a5fa?auto=format&fit=crop&w=1800&q=85" alt="Abstraktní 3D vizualizace" /></div><div className="collage-tile collage-detail"><img src="https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=1000&q=80" alt="3D prostorová abstrakce" /></div><div className="collage-tile collage-accent"><img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1000&q=80" alt="Digitální barevný detail" /></div></div>
+                  <div className="project-panel__collage"><div className="collage-tile collage-main"><img src="https://images.unsplash.com/photo-1614741118887-7a4ee193a5fa?auto=format&fit=crop&w=1800&q=85" alt="Abstraktní 3D vizualizace" /></div><div className="collage-tile collage-detail"><img src="https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=1000&q=80" alt="3D prostorová abstrakce" /></div><div className="collage-tile collage-accent"><img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1000&q=80" alt="Digitální barevný detail" /></div><div className="project-panel__info"><span className="eyebrow">04 / 3D — WEBGL</span><h3>DFLAT</h3><p>3D experiment v prohlížeči o prostoru, pohybu a interaktivním vizuálním vyprávění.</p><a href="https://akcizur.github.io/DFLAT/" target="_blank" rel="noopener noreferrer">Otevřít projekt <ExternalLink size={16} /></a></div></div>
                   <span className="project-panel__count">04 <i /> 04</span>
                 </article>
               </div>
@@ -1188,18 +1349,6 @@ export default function App() {
           </article>
         </section>
       </main>
-      <div className="project-info-layer" aria-live="polite">
-        <article className="project-panel__info is-current" data-project-info="0"><span className="eyebrow">01 / WEB — KATALOG</span><h3>GitGallery / BLaak</h3><p>Automatizovaný katalog webových projektů pro přehledné objevování a prezentaci.</p><a href="https://akcizur.github.io/blaak/" target="_blank" rel="noopener noreferrer">Otevřít projekt <ExternalLink size={16} /></a></article>
-        <article className="project-panel__info" data-project-info="1"><span className="eyebrow">02 / KNOWLEDGE WORKSPACE</span><h3>AKCIZUR Docs</h3><p>Dokumentace a pracovní informace propojené v jednom přehledném knowledge workspace.</p><a href="https://akcizur.github.io/docs/" target="_blank" rel="noopener noreferrer">Otevřít projekt <ExternalLink size={16} /></a></article>
-        <article className="project-panel__info" data-project-info="2"><span className="eyebrow">03 / SKLAD — VÝROBA</span><h3>Panana</h3><p>Nástroj pro řízení skladu a výroby s přehledným provozním workflow.</p><a href="https://github.com/akcizur/panana" target="_blank" rel="noopener noreferrer">Zobrazit na GitHubu <ExternalLink size={16} /></a></article>
-        <article className="project-panel__info" data-project-info="3"><span className="eyebrow">04 / 3D — WEBGL</span><h3>DFLAT</h3><p>3D experiment v prohlížeči o prostoru, pohybu a interaktivním vizuálním vyprávění.</p><a href="https://akcizur.github.io/DFLAT/" target="_blank" rel="noopener noreferrer">Otevřít projekt <ExternalLink size={16} /></a></article>
-      </div>
-      <div className="project-title-layer" aria-hidden="true">
-        <h3 className="project-title">GitGallery / BLaak</h3>
-        <h3 className="project-title">AKCIZUR Docs</h3>
-        <h3 className="project-title">Panana</h3>
-        <h3 className="project-title">DFLAT</h3>
-      </div>
 
       {/* Floating Story HUD Chapter Indicator with Five Windows Dynamic Switcher */}
       <div className="story-hud" aria-hidden="true">

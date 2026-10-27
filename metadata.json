@@ -1,5 +1,8 @@
 {
-  "description": "Portfolio Jakuba Růžičky: webdesign, UI/UX a frontend vývoj.",
-  "name": "RUZICKAJAKUB.cz",
-  "requestFramePermissions": []
+  "name": "Remix Jakub Růžička - Cinematic Portfolio",
+  "description": "Accessible, cinematic design engineering portfolio by Jakub Růžička featuring symmetric glass edges, smooth parallax, dark mode toggle, and fluid centered typography.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }
