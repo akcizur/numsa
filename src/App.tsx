@@ -1169,6 +1169,8 @@ export default function App() {
 
   return (
     <>
+      <a className="skip-link" href="#top">Přeskočit na obsah</a>
+
       {/* 24FPS Living Grain Canvas */}
       <canvas id="filmGrain" className="film-grain" aria-hidden="true" />
 
@@ -1199,7 +1201,7 @@ export default function App() {
             RUZICKAJAKUB
           </a>
 
-          <div className="nav-links">
+          <nav className="nav-links" aria-label="Hlavní navigace">
             <a href="#top" data-scroll-link>
             ÚVOD
             </a>
@@ -1227,12 +1229,12 @@ export default function App() {
               />
               <span className="theme-switch-track" aria-hidden="true" />
             </label>
-          </div>
+          </nav>
         </div>
       </header>
 
       {/* Main Content: Exact original sections, centered, no blopnout */}
-      <main id="top">
+      <main id="top" tabIndex={-1}>
         {/* Window 00: Hero Intro */}
         <section className="hero">
           <div className="parallax-stage" aria-hidden="true">
@@ -1256,12 +1258,20 @@ export default function App() {
           <div className="hero-inner" data-parallax="-0.03" data-depth="4">
             <span className="eyebrow">Webdesigner · UI/UX · Frontend & Creative Development</span>
             <h1>
-              RUZICKAJAKUB.cz
+              <span className="hero-name">RUZICKAJAKUB</span><span className="hero-domain">.cz</span>
             </h1>
             <p>
               Propojuji webdesign, UI/UX a frontend vývoj. Navrhuji digitální produkty, které dobře vypadají,
               snadno se používají a mají jasný účel.
             </p>
+            <div className="hero-actions">
+              <a className="hero-action hero-action--primary" href="#synthesis" data-scroll-link>
+                Prohlédnout projekty <ExternalLink size={16} aria-hidden="true" />
+              </a>
+              <a className="hero-action hero-action--secondary" href="mailto:ruzickajakub95@gmail.com">
+                Domluvit spolupráci
+              </a>
+            </div>
           </div>
         </section>
 
@@ -1326,22 +1336,22 @@ export default function App() {
               <h2>Projekty</h2>
               <p>Výběr digitálních produktů, nástrojů a experimentů. Každý projekt má vlastní prostor.</p>
             </header>
-            <div className="project-gallery" aria-label="Horizontální galerie projektů">
+            <div className="project-gallery" role="region" aria-roledescription="galerie" aria-label="Vybrané projekty">
               <div className="project-gallery__track">
                 <article className="project-panel collage--a" id="project-blaak">
-                  <div className="project-panel__collage"><div className="collage-tile collage-main"><img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1800&q=85" alt="Barevná digitální kompozice" /></div><div className="collage-tile collage-detail"><img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1000&q=80" alt="Detail obrazovky" /></div><div className="collage-tile collage-accent"><img src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&w=1000&q=80" alt="Barevná textura" /></div><div className="project-panel__info"><span className="eyebrow">01 / WEB — KATALOG</span><h3>GitGallery / BLaak</h3><p>Automatizovaný katalog webových projektů pro přehledné objevování a prezentaci.</p><a href="https://akcizur.github.io/blaak/" target="_blank" rel="noopener noreferrer">Otevřít projekt <ExternalLink size={16} /></a></div></div>
+                  <div className="project-panel__collage"><div className="collage-tile collage-main"><img loading="lazy" decoding="async" src={`${import.meta.env.BASE_URL}projects/blaak.svg`} alt="" aria-hidden="true" width="1200" height="800" /></div><div className="collage-tile collage-detail"><img loading="lazy" decoding="async" src={`${import.meta.env.BASE_URL}projects/blaak.svg`} alt="" aria-hidden="true" width="1200" height="800" /></div><div className="collage-tile collage-accent"><img loading="lazy" decoding="async" src={`${import.meta.env.BASE_URL}projects/blaak.svg`} alt="" aria-hidden="true" width="1200" height="800" /></div><div className="project-panel__info"><span className="eyebrow">01 / WEB — KATALOG</span><h3>GitGallery / BLaak</h3><p>Katalog webových projektů s náhledy, technologiemi a odkazy na živé ukázky a repozitáře.</p><div className="project-actions"><a className="project-link" href="https://akcizur.github.io/blaak/" target="_blank" rel="noopener noreferrer">Živá ukázka <ExternalLink size={16} aria-hidden="true" /></a><a className="project-link project-link--source" href="https://github.com/akcizur/blaak" target="_blank" rel="noopener noreferrer">Zdrojový kód <Github size={16} aria-hidden="true" /></a></div></div></div>
                   <span className="project-panel__count">01 <i /> 04</span>
                 </article>
                 <article className="project-panel collage--b" id="project-docs">
-                  <div className="project-panel__collage"><div className="collage-tile collage-main"><img src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&w=1800&q=85" alt="Barevná abstraktní textura" /></div><div className="collage-tile collage-detail"><img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1000&q=80" alt="Pracovní prostor" /></div><div className="collage-tile collage-accent"><img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1000&q=80" alt="Kód na obrazovce" /></div><div className="project-panel__info"><span className="eyebrow">02 / KNOWLEDGE WORKSPACE</span><h3>AKCIZUR Docs</h3><p>Dokumentace a pracovní informace propojené v jednom přehledném knowledge workspace.</p><a href="https://akcizur.github.io/docs/" target="_blank" rel="noopener noreferrer">Otevřít projekt <ExternalLink size={16} /></a></div></div>
+                  <div className="project-panel__collage"><div className="collage-tile collage-main"><img loading="lazy" decoding="async" src={`${import.meta.env.BASE_URL}projects/docs.svg`} alt="" aria-hidden="true" width="1200" height="800" /></div><div className="collage-tile collage-detail"><img loading="lazy" decoding="async" src={`${import.meta.env.BASE_URL}projects/docs.svg`} alt="" aria-hidden="true" width="1200" height="800" /></div><div className="collage-tile collage-accent"><img loading="lazy" decoding="async" src={`${import.meta.env.BASE_URL}projects/docs.svg`} alt="" aria-hidden="true" width="1200" height="800" /></div><div className="project-panel__info"><span className="eyebrow">02 / DOKUMENTACE — WORKSPACE</span><h3>AKCIZUR Docs</h3><p>Dokumentační web se zaměřením na přehlednou strukturu obsahu, navigaci a technické poznámky.</p><div className="project-actions"><a className="project-link" href="https://akcizur.github.io/docs/" target="_blank" rel="noopener noreferrer">Živá ukázka <ExternalLink size={16} aria-hidden="true" /></a><a className="project-link project-link--source" href="https://github.com/akcizur/docs" target="_blank" rel="noopener noreferrer">Zdrojový kód <Github size={16} aria-hidden="true" /></a></div></div></div>
                   <span className="project-panel__count">02 <i /> 04</span>
                 </article>
                 <article className="project-panel collage--c" id="project-panana">
-                  <div className="project-panel__collage"><div className="collage-tile collage-main"><img src="https://images.unsplash.com/photo-1618005198919-d3d4b5a92ead?auto=format&fit=crop&w=1800&q=85" alt="Abstraktní digitální obraz" /></div><div className="collage-tile collage-detail"><img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1000&q=80" alt="Skladový provoz" /></div><div className="collage-tile collage-accent"><img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1000&q=80" alt="Výrobní prostředí" /></div><div className="project-panel__info"><span className="eyebrow">03 / SKLAD — VÝROBA</span><h3>Panana</h3><p>Nástroj pro řízení skladu a výroby s přehledným provozním workflow.</p><a href="https://github.com/akcizur/panana" target="_blank" rel="noopener noreferrer">Zobrazit na GitHubu <ExternalLink size={16} /></a></div></div>
+                  <div className="project-panel__collage"><div className="collage-tile collage-main"><img loading="lazy" decoding="async" src={`${import.meta.env.BASE_URL}projects/panana.svg`} alt="" aria-hidden="true" width="1200" height="800" /></div><div className="collage-tile collage-detail"><img loading="lazy" decoding="async" src={`${import.meta.env.BASE_URL}projects/panana.svg`} alt="" aria-hidden="true" width="1200" height="800" /></div><div className="collage-tile collage-accent"><img loading="lazy" decoding="async" src={`${import.meta.env.BASE_URL}projects/panana.svg`} alt="" aria-hidden="true" width="1200" height="800" /></div><div className="project-panel__info"><span className="eyebrow">03 / WORKSPACE — POZNÁMKY</span><h3>Panana</h3><p>Minimalistický workspace inspirovaný Notionem pro práci s poznámkami a strukturovaným obsahem.</p><div className="project-actions"><a className="project-link" href="https://akcizur.github.io/panana/" target="_blank" rel="noopener noreferrer">Živá ukázka <ExternalLink size={16} aria-hidden="true" /></a><a className="project-link project-link--source" href="https://github.com/akcizur/panana" target="_blank" rel="noopener noreferrer">Zdrojový kód <Github size={16} aria-hidden="true" /></a></div></div></div>
                   <span className="project-panel__count">03 <i /> 04</span>
                 </article>
                 <article className="project-panel collage--d" id="project-dflat">
-                  <div className="project-panel__collage"><div className="collage-tile collage-main"><img src="https://images.unsplash.com/photo-1614741118887-7a4ee193a5fa?auto=format&fit=crop&w=1800&q=85" alt="Abstraktní 3D vizualizace" /></div><div className="collage-tile collage-detail"><img src="https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=1000&q=80" alt="3D prostorová abstrakce" /></div><div className="collage-tile collage-accent"><img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1000&q=80" alt="Digitální barevný detail" /></div><div className="project-panel__info"><span className="eyebrow">04 / 3D — WEBGL</span><h3>DFLAT</h3><p>3D experiment v prohlížeči o prostoru, pohybu a interaktivním vizuálním vyprávění.</p><a href="https://akcizur.github.io/DFLAT/" target="_blank" rel="noopener noreferrer">Otevřít projekt <ExternalLink size={16} /></a></div></div>
+                  <div className="project-panel__collage"><div className="collage-tile collage-main"><img loading="lazy" decoding="async" src={`${import.meta.env.BASE_URL}projects/dflat.svg`} alt="" aria-hidden="true" width="1200" height="800" /></div><div className="collage-tile collage-detail"><img loading="lazy" decoding="async" src={`${import.meta.env.BASE_URL}projects/dflat.svg`} alt="" aria-hidden="true" width="1200" height="800" /></div><div className="collage-tile collage-accent"><img loading="lazy" decoding="async" src={`${import.meta.env.BASE_URL}projects/dflat.svg`} alt="" aria-hidden="true" width="1200" height="800" /></div><div className="project-panel__info"><span className="eyebrow">04 / 3D — PROHLÍŽEČ</span><h3>DFLAT</h3><p>Interaktivní 3D scéna v prohlížeči s low-poly prostředím a atmosférou panelového bytu.</p><div className="project-actions"><a className="project-link" href="https://akcizur.github.io/DFLAT/" target="_blank" rel="noopener noreferrer">Živá ukázka <ExternalLink size={16} aria-hidden="true" /></a><a className="project-link project-link--source" href="https://github.com/akcizur/DFLAT" target="_blank" rel="noopener noreferrer">Zdrojový kód <Github size={16} aria-hidden="true" /></a></div></div></div>
                   <span className="project-panel__count">04 <i /> 04</span>
                 </article>
               </div>
@@ -1384,12 +1394,10 @@ export default function App() {
                 <span>Spolupráce na dálku</span>
               </section>
               <section className="simple-footer-block simple-footer-social">
-                <h3>Sociální sítě <small>připravuji</small></h3>
+                <h3>Zdrojové kódy</h3>
+                <span className="simple-footer-social-copy">Veřejné projekty, experimenty a další ukázky vývoje.</span>
                 <div className="simple-footer-social-links">
-                  <span aria-label="GitHub, připravuje se" title="Odkaz připravuji"><Github /></span>
-                  <span aria-label="X, připravuje se" title="Odkaz připravuji"><Twitter /></span>
-                  <span aria-label="LinkedIn, připravuje se" title="Odkaz připravuji"><Linkedin /></span>
-                  <span aria-label="Instagram, připravuje se" title="Odkaz připravuji"><Instagram /></span>
+                  <a href="https://github.com/akcizur" target="_blank" rel="noopener noreferrer" aria-label="GitHub profil Jakuba Růžičky" title="GitHub profil"><Github /></a>
                 </div>
               </section>
             </div>
