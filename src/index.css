@@ -2329,3 +2329,165 @@ html.light .nav { background: transparent !important; border: 0 !important; }
 @media (prefers-reduced-motion: reduce) {
   .nav-links { transition: none !important; }
 }
+
+
+/* Mobile stability: native vertical flow, no pinned horizontal scroll or snap jumps. */
+@media (max-width: 760px) {
+  html {
+    scroll-snap-type: none;
+    scroll-padding-top: calc(var(--nav-height) + env(safe-area-inset-top));
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    overscroll-behavior-y: auto;
+    scrollbar-gutter: auto;
+  }
+
+  /* Softer but deeper frosted edge at the top/bottom of the page. */
+  :root {
+    --edge-size: clamp(190px, 32svh, 270px);
+    --edge-blur-main: 76px;
+    --edge-blur-diffusion: 38px;
+  }
+  .edge { contain: paint; }
+  .edge::before {
+    inset: -18px -6% -18px;
+    backdrop-filter: blur(calc(var(--edge-blur-main) + var(--edge-energy) * 24px)) saturate(1.06);
+    -webkit-backdrop-filter: blur(calc(var(--edge-blur-main) + var(--edge-energy) * 24px)) saturate(1.06);
+  }
+  .edge::after {
+    inset: -12px -5%;
+    backdrop-filter: blur(calc(var(--edge-blur-diffusion) + var(--edge-energy) * 12px));
+    -webkit-backdrop-filter: blur(calc(var(--edge-blur-diffusion) + var(--edge-energy) * 12px));
+  }
+  .edge__glow { filter: blur(64px); }
+  .edge__haze { filter: blur(38px); }
+  .edge__mist { filter: blur(28px); }
+
+  /* Gallery becomes a sequence of independent, readable project cards. */
+  #synthesis .project-gallery {
+    position: relative;
+    left: calc((100% - 100vw) / 2);
+    width: 100vw;
+    height: auto !important;
+    min-height: 0;
+    overflow: visible;
+    background: transparent;
+    contain: none;
+  }
+  #synthesis .project-gallery__track {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(20px, 5vw, 32px);
+    width: 100%;
+    height: auto;
+    transform: none !important;
+    will-change: auto;
+  }
+  #synthesis .project-panel,
+  #synthesis .project-panel.collage--b,
+  #synthesis .project-panel.collage--c,
+  #synthesis .project-panel.collage--d {
+    position: relative;
+    flex: 0 0 auto;
+    width: 100%;
+    height: auto !important;
+    min-height: 0;
+    aspect-ratio: auto;
+    overflow: visible;
+    padding: 0 14px;
+    background: transparent;
+  }
+  #synthesis .project-panel::after { display: none; }
+  #synthesis .project-panel__collage,
+  #synthesis .project-panel.collage--b .project-panel__collage,
+  #synthesis .project-panel.collage--c .project-panel__collage,
+  #synthesis .project-panel.collage--d .project-panel__collage {
+    position: relative;
+    inset: auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-rows: clamp(190px, 57vw, 280px) clamp(84px, 23vw, 116px) auto;
+    gap: 9px;
+    width: 100%;
+    overflow: hidden;
+    border-radius: 18px;
+    background: var(--bg);
+  }
+  #synthesis .project-panel__collage .collage-tile,
+  #synthesis .project-panel.collage--b .collage-main,
+  #synthesis .project-panel.collage--c .collage-main,
+  #synthesis .project-panel.collage--d .collage-main {
+    grid-column: auto;
+    grid-row: auto;
+    min-height: 0;
+    border-radius: 12px;
+  }
+  #synthesis .project-panel__collage .collage-main {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+  #synthesis .project-panel__collage .collage-detail { grid-column: 1; grid-row: 2; }
+  #synthesis .project-panel__collage .collage-accent { grid-column: 2; grid-row: 2; }
+  #synthesis .project-panel__collage img { transform: none !important; }
+  #synthesis .project-panel__info {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 10px;
+    padding: 18px 2px 8px;
+    overflow: visible;
+    background: transparent;
+    color: var(--fg);
+    text-shadow: none;
+    opacity: 1 !important;
+    visibility: visible !important;
+    filter: none !important;
+    transform: none !important;
+    will-change: auto;
+  }
+  #synthesis .project-panel__info .eyebrow { color: var(--muted); font-size: 10px; }
+  #synthesis .project-panel__info h3 {
+    color: var(--fg);
+    font-size: clamp(28px, 8vw, 42px);
+    line-height: .98;
+  }
+  #synthesis .project-panel__info p {
+    max-width: 48ch;
+    color: var(--fg);
+    opacity: .78;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  #synthesis .project-panel__info a {
+    align-self: flex-start;
+    margin-top: 2px;
+    padding: 8px 0;
+    color: var(--fg);
+    font-size: 12px;
+  }
+  #synthesis .project-panel__info .project-actions {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px 18px;
+    margin-top: 2px;
+  }
+  #synthesis .project-panel__count {
+    top: 18px;
+    right: 28px;
+    z-index: 5;
+    color: #fff;
+  }
+}
+@media (max-width: 420px) {
+  #synthesis .project-panel { padding-inline: 12px; }
+  #synthesis .project-panel__collage {
+    grid-template-rows: clamp(180px, 58vw, 230px) 82px auto;
+    gap: 7px;
+  }
+}
