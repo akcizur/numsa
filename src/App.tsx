@@ -235,6 +235,98 @@ export default function App() {
             0.35
           );
         }
+
+        // 1b) Spatial composition: preserve the pointer-driven transforms while
+        // revealing each visual plane as a choreographed GSAP sequence.
+        const depthStage = hero.querySelector<HTMLElement>('.brutal-depth-stage');
+        const gridPlane = depthStage?.querySelector<HTMLElement>('.brutal-grid-plane');
+        const depthObjects = depthStage?.querySelectorAll<HTMLElement>('.brutal-object');
+        const depthLabels = depthStage?.querySelectorAll<HTMLElement>('.brutal-coordinate, .brutal-cross, .brutal-index');
+        const objectLabels = depthStage?.querySelectorAll<HTMLElement>('.brutal-object > span');
+        const heroSpecs = hero.querySelector<HTMLElement>('.hero-specs');
+
+        if (depthStage) {
+          introTl
+            .addLabel('spatial-build', 0.12)
+            .fromTo(
+              depthStage,
+              { autoAlpha: 0 },
+              { autoAlpha: 1, duration: 0.8, ease: 'sine.out' },
+              'spatial-build'
+            );
+        }
+
+        if (gridPlane) {
+          introTl.fromTo(
+            gridPlane,
+            { opacity: 0, clipPath: 'inset(24% 12% 0 12%)' },
+            { opacity: 0.33, clipPath: 'inset(0% 0% 0% 0%)', duration: 1.25, ease: 'power2.out' },
+            'spatial-build+=0.12'
+          );
+        }
+
+        if (depthObjects?.length) {
+          introTl.fromTo(
+            depthObjects,
+            { autoAlpha: 0, clipPath: 'inset(14% 0% 14% 0%)' },
+            {
+              autoAlpha: 1,
+              clipPath: 'inset(0% 0% 0% 0%)',
+              duration: 1.05,
+              stagger: 0.16,
+              ease: 'power3.out',
+            },
+            'spatial-build+=0.22'
+          );
+        }
+
+        if (objectLabels?.length) {
+          introTl.fromTo(
+            objectLabels,
+            { autoAlpha: 0, yPercent: 28, filter: 'blur(7px)' },
+            {
+              autoAlpha: 1,
+              yPercent: 0,
+              filter: 'blur(0px)',
+              duration: 0.65,
+              stagger: 0.11,
+              ease: 'power2.out',
+              onComplete: () => gsap.set(objectLabels, { clearProps: 'filter' }),
+            },
+            'spatial-build+=0.68'
+          );
+        }
+
+        if (depthLabels?.length) {
+          introTl.fromTo(
+            depthLabels,
+            { autoAlpha: 0, clipPath: 'inset(0 0 0 100%)' },
+            {
+              autoAlpha: 1,
+              clipPath: 'inset(0 0 0 0%)',
+              duration: 0.72,
+              stagger: 0.1,
+              ease: 'power2.out',
+            },
+            'spatial-build+=0.55'
+          );
+        }
+
+        if (heroSpecs) {
+          introTl.fromTo(
+            heroSpecs,
+            { autoAlpha: 0, y: 18, filter: 'blur(8px)' },
+            {
+              autoAlpha: 1,
+              y: 0,
+              filter: 'blur(0px)',
+              duration: 0.8,
+              ease: 'power3.out',
+              onComplete: () => gsap.set(heroSpecs, { clearProps: 'filter' }),
+            },
+            'spatial-build+=0.96'
+          );
+        }
       }
 
       // 2) Scroll Reveals for Sections 01 BLUR, 02 GRADIENT, 03 FADE
