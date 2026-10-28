@@ -48,51 +48,6 @@ export default function App() {
     localStorage.setItem('app_theme', isDark ? 'dark' : 'light');
   }, [isDark]);
 
-  // Pointer-driven parallax is limited to the hero and respects reduced-motion preferences.
-  useEffect(() => {
-    const hero = document.querySelector<HTMLElement>('.hero--brutal');
-    const stage = hero?.querySelector<HTMLElement>('.brutal-depth-stage');
-    if (!hero || !stage) return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    if (!window.matchMedia('(pointer: fine)').matches) return;
-
-    let rafId = 0;
-    let x = 0;
-    let y = 0;
-    const render = () => {
-      rafId = 0;
-      stage.style.setProperty('--depth-x-back', `${x * -10}px`);
-      stage.style.setProperty('--depth-y-back', `${y * -7}px`);
-      stage.style.setProperty('--depth-x-mid', `${x * -22}px`);
-      stage.style.setProperty('--depth-y-mid', `${y * -16}px`);
-      stage.style.setProperty('--depth-x-front', `${x * -38}px`);
-      stage.style.setProperty('--depth-y-front', `${y * -26}px`);
-      stage.style.setProperty('--depth-x-floor', `${x * 14}px`);
-      stage.style.setProperty('--depth-y-floor', `${y * 10}px`);
-      hero.style.setProperty('--brutal-light-x', `${(x + 0.5) * 100}%`);
-      hero.style.setProperty('--brutal-light-y', `${(y + 0.5) * 100}%`);
-    };
-    const onMove = (event: PointerEvent) => {
-      const rect = hero.getBoundingClientRect();
-      if (!rect.width || !rect.height) return;
-      x = Math.max(-0.5, Math.min(0.5, (event.clientX - rect.left) / rect.width - 0.5));
-      y = Math.max(-0.5, Math.min(0.5, (event.clientY - rect.top) / rect.height - 0.5));
-      if (!rafId) rafId = window.requestAnimationFrame(render);
-    };
-    const reset = () => {
-      x = 0;
-      y = 0;
-      if (!rafId) rafId = window.requestAnimationFrame(render);
-    };
-    hero.addEventListener('pointermove', onMove, { passive: true });
-    hero.addEventListener('pointerleave', reset, { passive: true });
-    return () => {
-      hero.removeEventListener('pointermove', onMove);
-      hero.removeEventListener('pointerleave', reset);
-      if (rafId) window.cancelAnimationFrame(rafId);
-    };
-  }, []);
-
   // Global 'T' shortcut to toggle theme
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -144,9 +99,8 @@ export default function App() {
       }
 
       if (edgeTopEl && edgeBottomEl) {
-        const sideEdges = Array.from(document.querySelectorAll<HTMLElement>('.edge--side'));
         introTl.fromTo(
-          [edgeTopEl, edgeBottomEl, ...sideEdges],
+          [edgeTopEl, edgeBottomEl],
           { opacity: 0 },
           { opacity: 1, duration: 1.1, ease: 'sine.out' },
           0
@@ -233,98 +187,6 @@ export default function App() {
             { opacity: 0, scale: 0.72 },
             { opacity: 0.92, scale: 1, duration: 1.3, stagger: 0.12, ease: 'power2.out' },
             0.35
-          );
-        }
-
-        // 1b) Spatial composition: preserve the pointer-driven transforms while
-        // revealing each visual plane as a choreographed GSAP sequence.
-        const depthStage = hero.querySelector<HTMLElement>('.brutal-depth-stage');
-        const gridPlane = depthStage?.querySelector<HTMLElement>('.brutal-grid-plane');
-        const depthObjects = depthStage?.querySelectorAll<HTMLElement>('.brutal-object');
-        const depthLabels = depthStage?.querySelectorAll<HTMLElement>('.brutal-coordinate, .brutal-cross, .brutal-index');
-        const objectLabels = depthStage?.querySelectorAll<HTMLElement>('.brutal-object > span');
-        const heroSpecs = hero.querySelector<HTMLElement>('.hero-specs');
-
-        if (depthStage) {
-          introTl
-            .addLabel('spatial-build', 0.12)
-            .fromTo(
-              depthStage,
-              { autoAlpha: 0 },
-              { autoAlpha: 1, duration: 0.8, ease: 'sine.out' },
-              'spatial-build'
-            );
-        }
-
-        if (gridPlane) {
-          introTl.fromTo(
-            gridPlane,
-            { opacity: 0, clipPath: 'inset(24% 12% 0 12%)' },
-            { opacity: 0.33, clipPath: 'inset(0% 0% 0% 0%)', duration: 1.25, ease: 'power2.out' },
-            'spatial-build+=0.12'
-          );
-        }
-
-        if (depthObjects?.length) {
-          introTl.fromTo(
-            depthObjects,
-            { autoAlpha: 0, clipPath: 'inset(14% 0% 14% 0%)' },
-            {
-              autoAlpha: 1,
-              clipPath: 'inset(0% 0% 0% 0%)',
-              duration: 1.05,
-              stagger: 0.16,
-              ease: 'power3.out',
-            },
-            'spatial-build+=0.22'
-          );
-        }
-
-        if (objectLabels?.length) {
-          introTl.fromTo(
-            objectLabels,
-            { autoAlpha: 0, yPercent: 28, filter: 'blur(7px)' },
-            {
-              autoAlpha: 1,
-              yPercent: 0,
-              filter: 'blur(0px)',
-              duration: 0.65,
-              stagger: 0.11,
-              ease: 'power2.out',
-              onComplete: () => gsap.set(objectLabels, { clearProps: 'filter' }),
-            },
-            'spatial-build+=0.68'
-          );
-        }
-
-        if (depthLabels?.length) {
-          introTl.fromTo(
-            depthLabels,
-            { autoAlpha: 0, clipPath: 'inset(0 0 0 100%)' },
-            {
-              autoAlpha: 1,
-              clipPath: 'inset(0 0 0 0%)',
-              duration: 0.72,
-              stagger: 0.1,
-              ease: 'power2.out',
-            },
-            'spatial-build+=0.55'
-          );
-        }
-
-        if (heroSpecs) {
-          introTl.fromTo(
-            heroSpecs,
-            { autoAlpha: 0, y: 18, filter: 'blur(8px)' },
-            {
-              autoAlpha: 1,
-              y: 0,
-              filter: 'blur(0px)',
-              duration: 0.8,
-              ease: 'power3.out',
-              onComplete: () => gsap.set(heroSpecs, { clearProps: 'filter' }),
-            },
-            'spatial-build+=0.96'
           );
         }
       }
@@ -579,7 +441,6 @@ export default function App() {
     let currentY = window.scrollY;
     let targetY = currentY;
     let velocity = 0;
-    let scrollMomentum = 0;
     let wheelDeltaRate = 0;
     let lastWheelTime = performance.now();
     let lastFrameTime = performance.now();
@@ -687,7 +548,6 @@ export default function App() {
       targetY = window.scrollY;
       currentY = window.scrollY;
       velocity = 0;
-      scrollMomentum = 0;
       wheelDeltaRate = 0;
     }
 
@@ -717,18 +577,11 @@ export default function App() {
 
       const now = performance.now();
       const dt = Math.max(8, now - lastWheelTime);
-      if (autoScrollAnimation) {
-        autoScrollAnimation = null;
-        targetY = currentY;
-        scrollMomentum = 0;
-      }
-      // Normalize wheel speed to a 60 Hz frame so rapid gestures feel stronger
-      // on high-refresh displays without making small trackpad gestures jumpy.
-      const instantVelocity = (deltaY / dt) * 16.667;
-      wheelDeltaRate = lerp(wheelDeltaRate, instantVelocity, 0.34);
+      const instantVelocity = deltaY / dt;
+      wheelDeltaRate = lerp(wheelDeltaRate, instantVelocity, 0.28);
       lastWheelTime = now;
 
-      const boost = clamp(1.06 + Math.abs(wheelDeltaRate) * 0.0048, 1.06, 1.8);
+      const boost = clamp(1 + Math.abs(wheelDeltaRate) * 0.06, 1, 1.32);
       targetY = clamp(targetY + deltaY * boost, 0, maxScroll);
       isIntertiaActive = true;
       scheduleFrame();
@@ -741,10 +594,9 @@ export default function App() {
         start: currentY,
         end: clampedTarget,
         startTime: performance.now(),
-        duration: clamp(320 + Math.abs(clampedTarget - currentY) * 0.085, 320, 720),
+        duration: clamp(380 + Math.abs(clampedTarget - currentY) * 0.12, 380, 820),
       };
       targetY = clampedTarget;
-      scrollMomentum = 0;
       isIntertiaActive = true;
       scheduleFrame();
     }
@@ -1008,29 +860,9 @@ export default function App() {
         targetY = autoScrollAnimation.end;
         if (progress >= 1) autoScrollAnimation = null;
       } else {
-        // Mass-and-spring scroll: quick for long flicks, gentle close to rest.
-        // Slightly under-critical damping preserves a tactile inertial glide.
-        const remaining = targetY - currentY;
-        const stiffness = clamp(360 + Math.abs(remaining) * 0.1, 360, 760);
-        const damping = 2 * Math.sqrt(stiffness) * 0.92;
-        const acceleration = remaining * stiffness - scrollMomentum * damping;
-        scrollMomentum += acceleration * (dt / 1000);
-
-        const nextY = currentY + scrollMomentum * (dt / 1000);
-        if (nextY <= 0) {
-          currentY = 0;
-          if (scrollMomentum < 0) scrollMomentum = 0;
-        } else if (nextY >= maxScroll) {
-          currentY = maxScroll;
-          if (scrollMomentum > 0) scrollMomentum = 0;
-        } else {
-          currentY = nextY;
-        }
-
-        if (Math.abs(targetY - currentY) < 0.35 && Math.abs(scrollMomentum) < 5) {
-          currentY = targetY;
-          scrollMomentum = 0;
-        }
+        const decay = 1 - Math.pow(0.00004, dt / 1000);
+        currentY = lerp(currentY, targetY, decay * 0.96);
+        if (Math.abs(targetY - currentY) < 0.08) currentY = targetY;
       }
 
       const instantVel = isIntertiaActive ? (currentY - window.scrollY) * (1000 / Math.max(1, dt)) : 0;
@@ -1045,7 +877,7 @@ export default function App() {
       velocity *= Math.pow(0.8, dt / 16.6667);
       updateParallaxAndEdges(currentY, velocity);
 
-      const hasMomentum = isIntertiaActive && (!!autoScrollAnimation || Math.abs(targetY - currentY) > 0.35 || Math.abs(scrollMomentum) > 5 || Math.abs(velocity) > 0.04);
+      const hasMomentum = isIntertiaActive && (!!autoScrollAnimation || Math.abs(targetY - currentY) > 0.08 || Math.abs(velocity) > 0.04);
 
       if (hasMomentum) {
         scheduleFrame();
@@ -1053,7 +885,6 @@ export default function App() {
         isIntertiaActive = false;
         autoScrollAnimation = null;
         velocity = 0;
-        scrollMomentum = 0;
         wheelDeltaRate = 0;
       }
     }
@@ -1157,10 +988,6 @@ export default function App() {
         <div className="edge__shine" />
       </div>
 
-      {/* Soft vertical refraction on the left and right viewport edges */}
-      <div className="edge edge--side edge--left" aria-hidden="true" />
-      <div className="edge edge--side edge--right" aria-hidden="true" />
-
       {/* Right Edge Scroll Progress */}
       <div className="scroll-progress" aria-hidden="true">
         <span />
@@ -1208,7 +1035,7 @@ export default function App() {
       {/* Main Content: Exact original sections, centered, no blopnout */}
       <main id="top" tabIndex={-1}>
         {/* Window 00: Hero Intro */}
-        <section className="hero hero--brutal" data-depth-scene>
+        <section className="hero">
           <div className="parallax-stage" aria-hidden="true">
             <div
               className="parallax-layer parallax-layer--1"
@@ -1227,20 +1054,8 @@ export default function App() {
             />
           </div>
 
-          <div className="brutal-depth-stage" aria-hidden="true">
-            <div className="brutal-coordinate brutal-coordinate--top"><span>FIELD STUDY</span><b>26.10</b></div>
-            <div className="brutal-grid-plane" />
-            <div className="brutal-object brutal-object--rear"><span>STRUCTURE / 01</span></div>
-            <div className="brutal-object brutal-object--main"><span>FORM<br />FOLLOWS<br />FUNCTION.</span></div>
-            <div className="brutal-object brutal-object--cap"><span>DEPTH / 04</span></div>
-            <div className="brutal-cross brutal-cross--a" />
-            <div className="brutal-cross brutal-cross--b" />
-            <div className="brutal-coordinate brutal-coordinate--bottom"><span>DESIGN</span><i /> <span>CODE</span><i /> <span>SPACE</span></div>
-            <div className="brutal-index"><b>01</b><span>SPATIAL<br />INTERFACE</span></div>
-          </div>
-
           <div className="hero-inner" data-parallax="-0.03" data-depth="4">
-            <span className="eyebrow">Design / Code / Spatial Experiments — 2026</span>
+            <span className="eyebrow">Webdesigner · UI/UX · Frontend & Creative Development</span>
             <h1>
               <span className="hero-name">RUZICKAJAKUB</span><span className="hero-domain">.cz</span>
             </h1>
@@ -1256,18 +1071,13 @@ export default function App() {
                 Domluvit spolupráci
               </a>
             </div>
-            <div className="hero-specs" aria-label="Oblasti tvorby">
-              <span><b>01</b> Digital design</span>
-              <span><b>02</b> Frontend systems</span>
-              <span><b>03</b> Interactive 3D</span>
-            </div>
           </div>
         </section>
 
         {/* Demo Sections: Windows 01, 02, 03 */}
         <section className="demo">
           {/* Window 01: BLUR */}
-          <article className="section section--brutal" id="blur" data-brutal-index="01">
+          <article className="section" id="blur">
             <div className="section-photo section-photo--blur" data-parallax="0.16" data-depth="1" aria-hidden="true" />
             <div className="section-grid">
               <div>
@@ -1289,7 +1099,7 @@ export default function App() {
           </article>
 
           {/* Window 02: GRADIENT */}
-          <article className="section section--brutal" id="gradient" data-brutal-index="02">
+          <article className="section" id="gradient">
             <div className="section-photo section-photo--gradient" data-parallax="-0.2" data-depth="2" aria-hidden="true" />
             <div className="section-grid">
               <div>
@@ -1309,7 +1119,7 @@ export default function App() {
           </article>
 
           {/* Window 03: FADE */}
-          <article className="section section--brutal" id="fade" data-brutal-index="03">
+          <article className="section" id="fade">
             <div className="section-photo section-photo--blur" data-parallax="0.16" data-depth="1" aria-hidden="true" />
             <div className="section-grid">
               <div><h2 data-parallax="0.045" data-depth="2">03<br />O MNĚ</h2></div>
@@ -1318,7 +1128,7 @@ export default function App() {
           </article>
 
           {/* Window 04: PORTFOLIO */}
-          <article className="section section--brutal" id="synthesis" data-brutal-index="04">
+          <article className="section" id="synthesis">
             <div className="section-photo section-photo--gradient" data-parallax="-0.18" data-depth="1" aria-hidden="true" />
             <header className="project-intro">
               <span className="eyebrow">04 / VÝBĚR PRÁCE</span>
