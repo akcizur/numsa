@@ -907,15 +907,29 @@ export default function App() {
       }
     }
 
+    let lastResizeWidth = window.innerWidth;
     function onResize() {
       if (resizeTimer !== null) window.clearTimeout(resizeTimer);
       resizeTimer = window.setTimeout(() => {
         resizeTimer = null;
+        const nextWidth = window.innerWidth;
+        const widthChanged = Math.abs(nextWidth - lastResizeWidth) > 2;
+        lastResizeWidth = nextWidth;
+
+        // On phones, Safari/Chrome expand and collapse their toolbars by changing the
+        // viewport height. Refreshing pinned scenes for that transient change causes jumps.
+        // The gallery is vertical on mobile, so only a real width/orientation change needs
+        // a full layout + ScrollTrigger refresh there.
+        if (nextWidth <= 760 && !widthChanged) {
+          scheduleFrame();
+          return;
+        }
+
         needsMeasure = true;
         initGrainBuffers();
-        ScrollTrigger.refresh();
+        if (nextWidth > 760 || widthChanged) ScrollTrigger.refresh();
         scheduleFrame();
-      }, 120);
+      }, 180);
     }
 
     function onPopState() {
