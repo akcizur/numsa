@@ -146,6 +146,19 @@ a {
   --edge-energy: var(--edge-energy-top);
 }
 
+/* Keep the upper glass blur active across the entire page, not only Projects. */
+.edge--top::before {
+  backdrop-filter: blur(124px) saturate(1.16);
+  -webkit-backdrop-filter: blur(124px) saturate(1.16);
+}
+.edge--top::after {
+  opacity: 0.94;
+}
+.edge--top .edge__haze,
+.edge--top .edge__mist {
+  opacity: 0.86;
+}
+
 /* The projects chapter intentionally intensifies the upper glass refraction. */
 .edge--top.edge--projects-active {
   --edge-energy: 0.72;
