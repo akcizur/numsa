@@ -4,7 +4,7 @@
  */
 
 import { useEffect, useState, useRef } from 'react';
-import { ExternalLink, Github } from 'lucide-react';
+import { ExternalLink, Github, Menu, X } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { calculateWindowTransfer, getWindowScrollTarget } from './utils/windowTransitions';
@@ -21,6 +21,7 @@ export default function App() {
     progress: 0,
   });
   const currentHudIndexRef = useRef(0);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const [isDark, setIsDark] = useState<boolean>(() => {
     if (typeof window !== 'undefined') {
@@ -30,6 +31,20 @@ export default function App() {
     }
     return true;
   });
+
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setIsMobileMenuOpen(false);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isMobileMenuOpen]);
 
   // Toggle dark/light theme
   const toggleTheme = () => {
@@ -993,42 +1008,28 @@ export default function App() {
         <span />
       </div>
 
-      {/* Navigation matching exact original with accessible dark mode toggle and all 4 windows */}
-      <header className="nav">
+      {/* Transparent navigation with a full-screen mobile menu */}
+      <header className={`nav${isMobileMenuOpen ? ' nav--menu-open' : ''}`}>
         <div className="nav-inner">
-          <a href="#top" className="brand" data-scroll-link>
+          <a href="#top" className="brand" data-scroll-link onClick={() => setIsMobileMenuOpen(false)}>
             RUZICKAJAKUB
           </a>
 
-          <nav className="nav-links" aria-label="Hlavní navigace">
-            <a href="#top" data-scroll-link>
-            ÚVOD
-            </a>
-            <a href="#blur" data-scroll-link>
-              WEB
-            </a>
-            <a href="#gradient" data-scroll-link>
-              UI/UX
-            </a>
-            <a href="#fade" data-scroll-link>
-              O MNĚ
-            </a>
-            <a href="#synthesis" data-scroll-link>
-              PROJEKTY
-            </a>
-
+          <nav className={`nav-links${isMobileMenuOpen ? ' nav-links--open' : ''}`} aria-label="Hlavní navigace" id="primary-navigation" aria-hidden={!isMobileMenuOpen && typeof window !== 'undefined' && window.innerWidth <= 760}>
+            <a href="#top" data-scroll-link onClick={() => setIsMobileMenuOpen(false)}>ÚVOD</a>
+            <a href="#blur" data-scroll-link onClick={() => setIsMobileMenuOpen(false)}>WEB</a>
+            <a href="#gradient" data-scroll-link onClick={() => setIsMobileMenuOpen(false)}>UI/UX</a>
+            <a href="#fade" data-scroll-link onClick={() => setIsMobileMenuOpen(false)}>O MNĚ</a>
+            <a href="#synthesis" data-scroll-link onClick={() => setIsMobileMenuOpen(false)}>PROJEKTY</a>
             <label className={`theme-switch ${isDark ? 'dark' : 'light'}`} title={`Přepnout na ${isDark ? 'světlý' : 'tmavý'} režim`}>
-              <input
-                className="theme-switch-input"
-                type="checkbox"
-                role="switch"
-                checked={!isDark}
-                onChange={toggleTheme}
-                aria-label={`Přepnout na ${isDark ? 'světlý' : 'tmavý'} režim`}
-              />
+              <input className="theme-switch-input" type="checkbox" role="switch" checked={!isDark} onChange={toggleTheme} aria-label={`Přepnout na ${isDark ? 'světlý' : 'tmavý'} režim`} />
               <span className="theme-switch-track" aria-hidden="true" />
             </label>
           </nav>
+
+          <button className="nav-menu-toggle" type="button" aria-label={isMobileMenuOpen ? 'Zavřít menu' : 'Otevřít menu'} aria-expanded={isMobileMenuOpen} aria-controls="primary-navigation" onClick={() => setIsMobileMenuOpen((open) => !open)}>
+            {isMobileMenuOpen ? <X size={24} aria-hidden="true" /> : <Menu size={24} aria-hidden="true" />}
+          </button>
         </div>
       </header>
 
