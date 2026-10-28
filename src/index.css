@@ -146,6 +146,24 @@ a {
   --edge-energy: var(--edge-energy-top);
 }
 
+/* The projects chapter intentionally intensifies the upper glass refraction. */
+.edge--top.edge--projects-active {
+  --edge-energy: 0.72;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+.edge--top.edge--projects-active::before {
+  backdrop-filter: blur(124px) saturate(1.16);
+  -webkit-backdrop-filter: blur(124px) saturate(1.16);
+}
+.edge--top.edge--projects-active::after {
+  opacity: 0.94;
+}
+.edge--top.edge--projects-active .edge__haze,
+.edge--top.edge--projects-active .edge__mist {
+  opacity: 0.86;
+}
+
 .edge--bottom {
   bottom: 0;
   --edge-energy: var(--edge-energy-bottom);
