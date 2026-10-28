@@ -99,8 +99,9 @@ export default function App() {
       }
 
       if (edgeTopEl && edgeBottomEl) {
+        const sideEdges = Array.from(document.querySelectorAll<HTMLElement>('.edge--side'));
         introTl.fromTo(
-          [edgeTopEl, edgeBottomEl],
+          [edgeTopEl, edgeBottomEl, ...sideEdges],
           { opacity: 0 },
           { opacity: 1, duration: 1.1, ease: 'sine.out' },
           0
@@ -987,6 +988,10 @@ export default function App() {
         <div className="edge__mist" />
         <div className="edge__shine" />
       </div>
+
+      {/* Soft vertical refraction on the left and right viewport edges */}
+      <div className="edge edge--side edge--left" aria-hidden="true" />
+      <div className="edge edge--side edge--right" aria-hidden="true" />
 
       {/* Right Edge Scroll Progress */}
       <div className="scroll-progress" aria-hidden="true">

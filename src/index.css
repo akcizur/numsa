@@ -2350,3 +2350,83 @@ html.light #synthesis .project-panel__collage .collage-tile {
     filter: none;
   }
 }
+
+
+/* Viewport side-edge refraction: a soft optical falloff on both sides.
+   Content stays interactive and crisp in the center; overlays never capture input. */
+:root {
+  --side-edge-blur: clamp(24px, 3.4vw, 48px);
+}
+.edge.edge--side {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: auto;
+  width: clamp(58px, 9vw, 138px);
+  height: auto;
+  z-index: 90;
+  overflow: visible;
+  pointer-events: none;
+  --edge-energy: max(var(--edge-energy-top), var(--edge-energy-bottom));
+}
+.edge.edge--side.edge--right {
+  left: auto;
+  right: 0;
+}
+.edge--side::before {
+  inset: -18px -14px;
+  background: rgba(5, 5, 5, .025);
+  backdrop-filter: blur(var(--side-edge-blur)) saturate(1.08);
+  -webkit-backdrop-filter: blur(var(--side-edge-blur)) saturate(1.08);
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, rgba(0,0,0,.96) 18%, rgba(0,0,0,.78) 40%, rgba(0,0,0,.42) 66%, transparent 100%);
+  mask-image: linear-gradient(90deg, #000 0%, rgba(0,0,0,.96) 18%, rgba(0,0,0,.78) 40%, rgba(0,0,0,.42) 66%, transparent 100%);
+  transform: none;
+}
+.edge--side.edge--right::before {
+  -webkit-mask-image: linear-gradient(270deg, #000 0%, rgba(0,0,0,.96) 18%, rgba(0,0,0,.78) 40%, rgba(0,0,0,.42) 66%, transparent 100%);
+  mask-image: linear-gradient(270deg, #000 0%, rgba(0,0,0,.96) 18%, rgba(0,0,0,.78) 40%, rgba(0,0,0,.42) 66%, transparent 100%);
+}
+.edge--side::after {
+  inset: -16px -10px;
+  background: linear-gradient(90deg, rgba(255,255,255,.055), rgba(255,255,255,.018) 38%, transparent 82%);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, rgba(0,0,0,.62) 32%, rgba(0,0,0,.22) 68%, transparent 100%);
+  mask-image: linear-gradient(90deg, #000 0%, rgba(0,0,0,.62) 32%, rgba(0,0,0,.22) 68%, transparent 100%);
+  opacity: .58;
+}
+.edge--side.edge--right::after {
+  background: linear-gradient(270deg, rgba(255,255,255,.055), rgba(255,255,255,.018) 38%, transparent 82%);
+  -webkit-mask-image: linear-gradient(270deg, #000 0%, rgba(0,0,0,.62) 32%, rgba(0,0,0,.22) 68%, transparent 100%);
+  mask-image: linear-gradient(270deg, #000 0%, rgba(0,0,0,.62) 32%, rgba(0,0,0,.22) 68%, transparent 100%);
+}
+html.light .edge--side::before {
+  background: rgba(255, 255, 255, .04);
+}
+html.light .edge--side::after {
+  background: linear-gradient(90deg, rgba(15,23,42,.035), rgba(15,23,42,.012) 38%, transparent 82%);
+}
+html.light .edge--side.edge--right::after {
+  background: linear-gradient(270deg, rgba(15,23,42,.035), rgba(15,23,42,.012) 38%, transparent 82%);
+}
+@media (max-width: 760px) {
+  :root {
+    --side-edge-blur: clamp(18px, 4.5vw, 30px);
+  }
+  .edge.edge--side {
+    width: clamp(32px, 7vw, 58px);
+  }
+  .edge--side::before {
+    inset: -10px -8px;
+  }
+  .edge--side::after {
+    inset: -10px -6px;
+    opacity: .4;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .edge.edge--side {
+    transition: none;
+  }
+}
