@@ -2314,3 +2314,39 @@ html.light .hero-action--secondary { background: rgba(255, 255, 255, .7); }
   .skip-link, .hero-action { transition: none; }
   .hero-action:hover { transform: none; }
 }
+
+
+/* Distinct crops for local project previews: create a small editorial collage
+   without downloading remote imagery or changing the underlying mockups. */
+#synthesis .project-panel__collage .collage-tile {
+  background: #080a0d;
+  border: 1px solid rgba(255, 255, 255, .075);
+}
+#synthesis .project-panel__collage .collage-main img {
+  object-position: 50% 50%;
+  filter: saturate(1.03) contrast(1.02);
+}
+#synthesis .project-panel__collage .collage-detail img {
+  object-position: 82% 20%;
+  filter: saturate(.82) contrast(1.08) brightness(1.04);
+}
+#synthesis .project-panel__collage .collage-accent img {
+  object-position: 18% 82%;
+  filter: saturate(.72) contrast(1.12) brightness(.9);
+}
+html.light #synthesis .project-panel__collage .collage-tile {
+  border-color: rgba(23, 33, 43, .12);
+}
+@media (max-width: 760px) {
+  #synthesis .project-panel__collage .collage-detail img {
+    object-position: 78% 22%;
+  }
+  #synthesis .project-panel__collage .collage-accent img {
+    object-position: 18% 78%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #synthesis .project-panel__collage img {
+    filter: none;
+  }
+}
