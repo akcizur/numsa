@@ -26,6 +26,13 @@ jobs:
           bun-version: 1.4.3
       - name: Install dependencies
         run: bun install --frozen-lockfile
+<<<<<<< HEAD
+=======
+      - name: Run tests
+        run: bun run test
+      - name: Type-check
+        run: bun run lint
+>>>>>>> 11e440a3df865522797021ad57087a84b6645a82
       - name: Build site
         run: bun run build
         env:

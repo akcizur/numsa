@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+<<<<<<< HEAD
 import React, { useEffect, useState, useRef } from 'react';
 import {
   ExternalLink,
@@ -11,6 +12,10 @@ import {
   Linkedin,
   Instagram,
 } from 'lucide-react';
+=======
+import { useEffect, useState, useRef } from 'react';
+import { ExternalLink, Github, Menu, X } from 'lucide-react';
+>>>>>>> 11e440a3df865522797021ad57087a84b6645a82
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { calculateWindowTransfer, getWindowScrollTarget } from './utils/windowTransitions';
@@ -20,6 +25,7 @@ import { BackToTop } from './components/BackToTop';
 gsap.registerPlugin(ScrollTrigger);
 
 export default function App() {
+<<<<<<< HEAD
   const [isDark, setIsDark] = useState<boolean>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('app_theme');
@@ -30,15 +36,44 @@ export default function App() {
   });
 
 
+=======
+>>>>>>> 11e440a3df865522797021ad57087a84b6645a82
   const [activeHud, setActiveHud] = useState({
     idx: 0,
     n: '00',
     name: 'INTRO',
     progress: 0,
   });
-
   const currentHudIndexRef = useRef(0);
+<<<<<<< HEAD
   const projectGalleryPinnedRef = useRef(false);
+=======
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Keep the server and first client render identical; restore the saved theme after hydration.
+  const [isDark, setIsDark] = useState<boolean>(true);
+  const [themeReady, setThemeReady] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('app_theme');
+    if (saved === 'light' || saved === 'dark') setIsDark(saved === 'dark');
+    setThemeReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setIsMobileMenuOpen(false);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isMobileMenuOpen]);
+>>>>>>> 11e440a3df865522797021ad57087a84b6645a82
 
   // Toggle dark/light theme
   const toggleTheme = () => {
@@ -46,6 +81,7 @@ export default function App() {
   };
 
   useEffect(() => {
+    if (!themeReady) return;
     const root = document.documentElement;
     if (isDark) {
       root.classList.add('dark');
@@ -55,7 +91,7 @@ export default function App() {
       root.classList.remove('dark');
     }
     localStorage.setItem('app_theme', isDark ? 'dark' : 'light');
-  }, [isDark]);
+  }, [isDark, themeReady]);
 
   // Global 'T' shortcut to toggle theme
   useEffect(() => {
@@ -313,6 +349,7 @@ export default function App() {
         }
       });
 
+<<<<<<< HEAD
       // Full-window gallery driven by vertical scroll; collage proportions and captions travel sideways.
       const projectGallery = document.querySelector<HTMLElement>('#synthesis .project-gallery');
       const projectTrack = document.querySelector<HTMLElement>('#synthesis .project-gallery__track');
@@ -325,6 +362,30 @@ export default function App() {
       if (projectGallery && projectTrack && projectPanels.length) {
         const mobileGallery = window.matchMedia('(max-width: 760px)').matches;
         const horizontalTween = mobileGallery ? null : gsap.to(projectTrack, {
+=======
+      // Keep the upper glass blur visibly active while the Projects chapter is on screen.
+      const projectsSection = document.querySelector<HTMLElement>('#synthesis');
+      const topGlassEdge = document.querySelector<HTMLElement>('.edge--top');
+      if (projectsSection && topGlassEdge) {
+        ScrollTrigger.create({
+          trigger: projectsSection,
+          start: 'top 88%',
+          end: 'bottom 12%',
+          onToggle: (self) => topGlassEdge.classList.toggle('edge--projects-active', self.isActive),
+          onRefresh: (self) => topGlassEdge.classList.toggle('edge--projects-active', self.isActive),
+        });
+      }
+
+      // Full-window horizontal gallery driven by vertical scroll, with each caption rising through a blurred edge.
+      const projectGallery = document.querySelector<HTMLElement>('#synthesis .project-gallery');
+      const projectTrack = document.querySelector<HTMLElement>('#synthesis .project-gallery__track');
+      const projectPanels = gsap.utils.toArray<HTMLElement>('#synthesis .project-panel');
+      // The pinned horizontal scrub is desktop-only. Mobile uses a stable vertical card stack
+      // to avoid address-bar viewport changes shifting pinned ScrollTrigger coordinates.
+      const desktopGallery = window.matchMedia('(min-width: 761px) and (prefers-reduced-motion: no-preference)').matches;
+      if (desktopGallery && projectGallery && projectTrack && projectPanels.length) {
+        const horizontalTween = gsap.to(projectTrack, {
+>>>>>>> 11e440a3df865522797021ad57087a84b6645a82
           x: () => -(projectTrack.scrollWidth - projectGallery.clientWidth),
           ease: 'none',
           scrollTrigger: {
@@ -1007,15 +1068,29 @@ export default function App() {
       }
     }
 
+    let lastResizeWidth = window.innerWidth;
     function onResize() {
       if (resizeTimer !== null) window.clearTimeout(resizeTimer);
       resizeTimer = window.setTimeout(() => {
         resizeTimer = null;
+        const nextWidth = window.innerWidth;
+        const widthChanged = Math.abs(nextWidth - lastResizeWidth) > 2;
+        lastResizeWidth = nextWidth;
+
+        // On phones, Safari/Chrome expand and collapse their toolbars by changing the
+        // viewport height. Refreshing pinned scenes for that transient change causes jumps.
+        // The gallery is vertical on mobile, so only a real width/orientation change needs
+        // a full layout + ScrollTrigger refresh there.
+        if (nextWidth <= 760 && !widthChanged) {
+          scheduleFrame();
+          return;
+        }
+
         needsMeasure = true;
         initGrainBuffers();
-        ScrollTrigger.refresh();
+        if (nextWidth > 760 || widthChanged) ScrollTrigger.refresh();
         scheduleFrame();
-      }, 120);
+      }, 180);
     }
 
     function onPopState() {
@@ -1075,6 +1150,7 @@ export default function App() {
 
   return (
     <>
+<<<<<<< HEAD
       <div className="intro-overlay" aria-hidden="true">
         <div className="intro-curtain intro-curtain--top" />
         <div className="intro-curtain intro-curtain--bottom" />
@@ -1084,6 +1160,10 @@ export default function App() {
           <span className="intro-caption">DESIGN · INTERACTION · DEVELOPMENT</span>
         </div>
       </div>
+=======
+      <a className="skip-link" href="#top">Přeskočit na obsah</a>
+
+>>>>>>> 11e440a3df865522797021ad57087a84b6645a82
       {/* 24FPS Living Grain Canvas */}
       <canvas id="filmGrain" className="film-grain" aria-hidden="true" />
 
@@ -1107,47 +1187,33 @@ export default function App() {
         <span />
       </div>
 
-      {/* Navigation matching exact original with accessible dark mode toggle and all 4 windows */}
-      <header className="nav">
+      {/* Transparent navigation with a full-screen mobile menu */}
+      <header className={`nav${isMobileMenuOpen ? ' nav--menu-open' : ''}`}>
         <div className="nav-inner">
-          <a href="#top" className="brand" data-scroll-link>
+          <a href="#top" className="brand" data-scroll-link onClick={() => setIsMobileMenuOpen(false)}>
             RUZICKAJAKUB
           </a>
 
-          <div className="nav-links">
-            <a href="#top" data-scroll-link>
-            ÚVOD
-            </a>
-            <a href="#blur" data-scroll-link>
-              WEB
-            </a>
-            <a href="#gradient" data-scroll-link>
-              UI/UX
-            </a>
-            <a href="#fade" data-scroll-link>
-              O MNĚ
-            </a>
-            <a href="#synthesis" data-scroll-link>
-              PROJEKTY
-            </a>
-
+          <nav className={`nav-links${isMobileMenuOpen ? ' nav-links--open' : ''}`} aria-label="Hlavní navigace" id="primary-navigation" aria-hidden={!isMobileMenuOpen && typeof window !== 'undefined' && window.innerWidth <= 760}>
+            <a href="#top" data-scroll-link onClick={() => setIsMobileMenuOpen(false)}>ÚVOD</a>
+            <a href="#blur" data-scroll-link onClick={() => setIsMobileMenuOpen(false)}>WEB</a>
+            <a href="#gradient" data-scroll-link onClick={() => setIsMobileMenuOpen(false)}>UI/UX</a>
+            <a href="#fade" data-scroll-link onClick={() => setIsMobileMenuOpen(false)}>O MNĚ</a>
+            <a href="#synthesis" data-scroll-link onClick={() => setIsMobileMenuOpen(false)}>PROJEKTY</a>
             <label className={`theme-switch ${isDark ? 'dark' : 'light'}`} title={`Přepnout na ${isDark ? 'světlý' : 'tmavý'} režim`}>
-              <input
-                className="theme-switch-input"
-                type="checkbox"
-                role="switch"
-                checked={!isDark}
-                onChange={toggleTheme}
-                aria-label={`Přepnout na ${isDark ? 'světlý' : 'tmavý'} režim`}
-              />
+              <input className="theme-switch-input" type="checkbox" role="switch" checked={!isDark} onChange={toggleTheme} aria-label={`Přepnout na ${isDark ? 'světlý' : 'tmavý'} režim`} />
               <span className="theme-switch-track" aria-hidden="true" />
             </label>
-          </div>
+          </nav>
+
+          <button className="nav-menu-toggle" type="button" aria-label={isMobileMenuOpen ? 'Zavřít menu' : 'Otevřít menu'} aria-expanded={isMobileMenuOpen} aria-controls="primary-navigation" onClick={() => setIsMobileMenuOpen((open) => !open)}>
+            {isMobileMenuOpen ? <X size={24} aria-hidden="true" /> : <Menu size={24} aria-hidden="true" />}
+          </button>
         </div>
       </header>
 
       {/* Main Content: Exact original sections, centered, no blopnout */}
-      <main id="top">
+      <main id="top" tabIndex={-1}>
         {/* Window 00: Hero Intro */}
         <section className="hero">
           <div className="parallax-stage" aria-hidden="true">
@@ -1171,7 +1237,7 @@ export default function App() {
           <div className="hero-inner" data-parallax="-0.03" data-depth="4">
             <span className="eyebrow">Webdesigner · UI/UX · Frontend & Creative Development</span>
             <h1>
-              RUZICKAJAKUB.cz
+              <span className="hero-name">RUZICKAJAKUB</span><span className="hero-domain">.cz</span>
             </h1>
             <p>
               Propojuji webdesign, UI/UX a frontend vývoj. Navrhuji digitální produkty, které dobře vypadají,
@@ -1179,6 +1245,7 @@ export default function App() {
             </p>
             <div className="hero-actions">
               <a className="hero-action hero-action--primary" href="#synthesis" data-scroll-link>
+<<<<<<< HEAD
                 Prohlédnout projekty <span aria-hidden="true">↗</span>
               </a>
               <a className="hero-action hero-action--secondary" href="mailto:ruzickajakub95@gmail.com">
@@ -1189,6 +1256,14 @@ export default function App() {
               <span>Praha · Spolupráce na dálku</span>
               <a href="#blur" data-scroll-link aria-label="Posunout se na další sekci"><span className="hero-scroll-mark" /> DALŠÍ SEKCE</a>
             </div>
+=======
+                Prohlédnout projekty <ExternalLink size={16} aria-hidden="true" />
+              </a>
+              <a className="hero-action hero-action--secondary" href="mailto:ruzickajakub95@gmail.com">
+                Domluvit spolupráci
+              </a>
+            </div>
+>>>>>>> 11e440a3df865522797021ad57087a84b6645a82
           </div>
         </section>
 
@@ -1253,9 +1328,10 @@ export default function App() {
               <h2>Projekty</h2>
               <p>Výběr digitálních produktů, nástrojů a experimentů. Každý projekt má vlastní prostor.</p>
             </header>
-            <div className="project-gallery" aria-label="Horizontální galerie projektů">
+            <div className="project-gallery" role="region" aria-roledescription="galerie" aria-label="Vybrané projekty">
               <div className="project-gallery__track">
                 <article className="project-panel collage--a" id="project-blaak">
+<<<<<<< HEAD
                   <div className="project-panel__collage"><div className="collage-tile collage-main"><img loading="lazy" decoding="async" src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1800&q=85" alt="Barevná digitální kompozice" /></div><div className="collage-tile collage-detail"><img loading="lazy" decoding="async" src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1000&q=80" alt="Detail obrazovky" /></div><div className="collage-tile collage-accent"><img loading="lazy" decoding="async" src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&w=1000&q=80" alt="Barevná textura" /></div></div>
                   <div className="project-panel__info-mobile"><span className="eyebrow">01 / WEB — KATALOG</span><h3>GitGallery / BLaak</h3><p>Automatizovaný katalog webových projektů pro přehledné objevování a prezentaci.</p><a href="https://akcizur.github.io/blaak/" target="_blank" rel="noopener noreferrer">Otevřít projekt <ExternalLink size={16} /></a></div>
                   <span className="project-panel__count">01 <i /> 04</span>
@@ -1273,6 +1349,21 @@ export default function App() {
                 <article className="project-panel collage--d" id="project-dflat">
                   <div className="project-panel__collage"><div className="collage-tile collage-main"><img loading="lazy" decoding="async" src="https://images.unsplash.com/photo-1614741118887-7a4ee193a5fa?auto=format&fit=crop&w=1800&q=85" alt="Abstraktní 3D vizualizace" /></div><div className="collage-tile collage-detail"><img loading="lazy" decoding="async" src="https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=1000&q=80" alt="3D prostorová abstrakce" /></div><div className="collage-tile collage-accent"><img loading="lazy" decoding="async" src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1000&q=80" alt="Digitální barevný detail" /></div></div>
                   <div className="project-panel__info-mobile"><span className="eyebrow">04 / 3D — WEBGL</span><h3>DFLAT</h3><p>3D experiment v prohlížeči o prostoru, pohybu a interaktivním vizuálním vyprávění.</p><a href="https://akcizur.github.io/DFLAT/" target="_blank" rel="noopener noreferrer">Otevřít projekt <ExternalLink size={16} /></a></div>
+=======
+                  <div className="project-panel__collage"><div className="collage-tile collage-main"><img loading="lazy" decoding="async" src={`${import.meta.env.BASE_URL}projects/blaak.svg`} alt="" aria-hidden="true" width="1200" height="800" /></div><div className="collage-tile collage-detail"><img loading="lazy" decoding="async" src={`${import.meta.env.BASE_URL}projects/blaak.svg`} alt="" aria-hidden="true" width="1200" height="800" /></div><div className="collage-tile collage-accent"><img loading="lazy" decoding="async" src={`${import.meta.env.BASE_URL}projects/blaak.svg`} alt="" aria-hidden="true" width="1200" height="800" /></div><div className="project-panel__info"><span className="eyebrow">01 / WEB — KATALOG</span><h3>GitGallery / BLaak</h3><p>Katalog webových projektů s náhledy, technologiemi a odkazy na živé ukázky a repozitáře.</p><div className="project-actions"><a className="project-link" href="https://akcizur.github.io/blaak/" target="_blank" rel="noopener noreferrer">Živá ukázka <ExternalLink size={16} aria-hidden="true" /></a><a className="project-link project-link--source" href="https://github.com/akcizur/blaak" target="_blank" rel="noopener noreferrer">Zdrojový kód <Github size={16} aria-hidden="true" /></a></div></div></div>
+                  <span className="project-panel__count">01 <i /> 04</span>
+                </article>
+                <article className="project-panel collage--b" id="project-docs">
+                  <div className="project-panel__collage"><div className="collage-tile collage-main"><img loading="lazy" decoding="async" src={`${import.meta.env.BASE_URL}projects/docs.svg`} alt="" aria-hidden="true" width="1200" height="800" /></div><div className="collage-tile collage-detail"><img loading="lazy" decoding="async" src={`${import.meta.env.BASE_URL}projects/docs.svg`} alt="" aria-hidden="true" width="1200" height="800" /></div><div className="collage-tile collage-accent"><img loading="lazy" decoding="async" src={`${import.meta.env.BASE_URL}projects/docs.svg`} alt="" aria-hidden="true" width="1200" height="800" /></div><div className="project-panel__info"><span className="eyebrow">02 / DOKUMENTACE — WORKSPACE</span><h3>AKCIZUR Docs</h3><p>Dokumentační web se zaměřením na přehlednou strukturu obsahu, navigaci a technické poznámky.</p><div className="project-actions"><a className="project-link" href="https://akcizur.github.io/docs/" target="_blank" rel="noopener noreferrer">Živá ukázka <ExternalLink size={16} aria-hidden="true" /></a><a className="project-link project-link--source" href="https://github.com/akcizur/docs" target="_blank" rel="noopener noreferrer">Zdrojový kód <Github size={16} aria-hidden="true" /></a></div></div></div>
+                  <span className="project-panel__count">02 <i /> 04</span>
+                </article>
+                <article className="project-panel collage--c" id="project-panana">
+                  <div className="project-panel__collage"><div className="collage-tile collage-main"><img loading="lazy" decoding="async" src={`${import.meta.env.BASE_URL}projects/panana.svg`} alt="" aria-hidden="true" width="1200" height="800" /></div><div className="collage-tile collage-detail"><img loading="lazy" decoding="async" src={`${import.meta.env.BASE_URL}projects/panana.svg`} alt="" aria-hidden="true" width="1200" height="800" /></div><div className="collage-tile collage-accent"><img loading="lazy" decoding="async" src={`${import.meta.env.BASE_URL}projects/panana.svg`} alt="" aria-hidden="true" width="1200" height="800" /></div><div className="project-panel__info"><span className="eyebrow">03 / WORKSPACE — POZNÁMKY</span><h3>Panana</h3><p>Minimalistický workspace inspirovaný Notionem pro práci s poznámkami a strukturovaným obsahem.</p><div className="project-actions"><a className="project-link" href="https://akcizur.github.io/panana/" target="_blank" rel="noopener noreferrer">Živá ukázka <ExternalLink size={16} aria-hidden="true" /></a><a className="project-link project-link--source" href="https://github.com/akcizur/panana" target="_blank" rel="noopener noreferrer">Zdrojový kód <Github size={16} aria-hidden="true" /></a></div></div></div>
+                  <span className="project-panel__count">03 <i /> 04</span>
+                </article>
+                <article className="project-panel collage--d" id="project-dflat">
+                  <div className="project-panel__collage"><div className="collage-tile collage-main"><img loading="lazy" decoding="async" src={`${import.meta.env.BASE_URL}projects/dflat.svg`} alt="" aria-hidden="true" width="1200" height="800" /></div><div className="collage-tile collage-detail"><img loading="lazy" decoding="async" src={`${import.meta.env.BASE_URL}projects/dflat.svg`} alt="" aria-hidden="true" width="1200" height="800" /></div><div className="collage-tile collage-accent"><img loading="lazy" decoding="async" src={`${import.meta.env.BASE_URL}projects/dflat.svg`} alt="" aria-hidden="true" width="1200" height="800" /></div><div className="project-panel__info"><span className="eyebrow">04 / 3D — PROHLÍŽEČ</span><h3>DFLAT</h3><p>Interaktivní 3D scéna v prohlížeči s low-poly prostředím a atmosférou panelového bytu.</p><div className="project-actions"><a className="project-link" href="https://akcizur.github.io/DFLAT/" target="_blank" rel="noopener noreferrer">Živá ukázka <ExternalLink size={16} aria-hidden="true" /></a><a className="project-link project-link--source" href="https://github.com/akcizur/DFLAT" target="_blank" rel="noopener noreferrer">Zdrojový kód <Github size={16} aria-hidden="true" /></a></div></div></div>
+>>>>>>> 11e440a3df865522797021ad57087a84b6645a82
                   <span className="project-panel__count">04 <i /> 04</span>
                 </article>
               </div>
@@ -1331,12 +1422,10 @@ export default function App() {
                 <span>Spolupráce na dálku</span>
               </section>
               <section className="simple-footer-block simple-footer-social">
-                <h3>Sociální sítě <small>připravuji</small></h3>
+                <h3>Zdrojové kódy</h3>
+                <span className="simple-footer-social-copy">Veřejné projekty, experimenty a další ukázky vývoje.</span>
                 <div className="simple-footer-social-links">
-                  <span aria-label="GitHub, připravuje se" title="Odkaz připravuji"><Github /></span>
-                  <span aria-label="X, připravuje se" title="Odkaz připravuji"><Twitter /></span>
-                  <span aria-label="LinkedIn, připravuje se" title="Odkaz připravuji"><Linkedin /></span>
-                  <span aria-label="Instagram, připravuje se" title="Odkaz připravuji"><Instagram /></span>
+                  <a href="https://github.com/akcizur" target="_blank" rel="noopener noreferrer" aria-label="GitHub profil Jakuba Růžičky" title="GitHub profil"><Github /></a>
                 </div>
               </section>
             </div>
