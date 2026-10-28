@@ -1,0 +1,46 @@
+name: Fix navbar transparency
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '.github/workflows/fix-navbar-transparency.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    if: github.event_name == 'workflow_dispatch' || !contains(github.event.head_commit.message, '[navbar-fix]')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Remove navbar background overrides
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('src/index.css')
+          s = p.read_text()
+          old = s
+          import re
+          s = re.sub(r'\n\.nav \{\n  background: rgba\(5,5,5,\.94\);\n  border-bottom: 1px solid var\(--brutal-rule\);\n  backdrop-filter: blur\(10px\) saturate\(\.7\);\n  -webkit-backdrop-filter: blur\(10px\) saturate\(\.7\);\n\}\nhtml\.light \.nav \{ background: rgba\(240,240,236,\.96\); border-bottom-color: var\(--brutal-rule\); \}\n', '\n', s)
+          s = re.sub(r'\n\.nav \{\n  background: rgba\(5, 5, 5, \.78\);\n  border-bottom: 1px solid rgba\(255, 255, 255, \.09\);\n  backdrop-filter: blur\(16px\) saturate\(1\.1\);\n  -webkit-backdrop-filter: blur\(16px\) saturate\(1\.1\);\n\}\nhtml\.light \.nav \{\n  background: rgba\(244, 247, 250, \.9\);\n  border-bottom-color: rgba\(23, 33, 43, \.12\);\n\}\n', '\n', s)
+          s = re.sub(r'\nhtml\.light \.nav \{\n  background: rgba\(244,247,250,\.76\);\n  border-bottom: 1px solid rgba\(23,33,43,\.09\);\n  backdrop-filter: blur\(18px\) saturate\(1\.2\);\n  -webkit-backdrop-filter: blur\(18px\) saturate\(1\.2\);\n\}\n', '\n', s)
+          if s == old:
+              raise SystemExit('No navbar background override found')
+          p.write_text(s)
+          PY
+
+      - name: Commit fix
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/index.css
+          git diff --cached --quiet && exit 0
+          git commit -m 'Fix transparent navbar [navbar-fix]'
+          git push
