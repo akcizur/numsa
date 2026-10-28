@@ -2316,14 +2316,14 @@ html.light .nav { background: transparent !important; border: 0 !important; }
 @media (max-width: 760px) {
   .nav { z-index: 110; }
   .nav-inner { position: relative; z-index: 111; width: calc(100% - 28px); }
-  .nav-menu-toggle { display: inline-flex; }
-  .nav-links { position: fixed; inset: 0; z-index: 115; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: clamp(18px, 4.5vh, 36px); padding: 88px clamp(28px, 9vw, 64px) 48px; background: var(--bg); color: var(--fg); opacity: 0; visibility: hidden; pointer-events: none; transform: translateY(-8px); transition: opacity .24s ease, transform .24s ease, visibility .24s ease; }
+  .nav-menu-toggle { display: inline-flex; z-index: 121; }
+  .nav-links { position: fixed; inset: 0; z-index: 118; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: clamp(18px, 4.5vh, 36px); width: 100vw; max-width: none; height: 100vh; height: 100dvh; min-height: 100svh; overflow-y: auto; overscroll-behavior: contain; padding: max(88px, env(safe-area-inset-top)) clamp(28px, 9vw, 64px) max(48px, env(safe-area-inset-bottom)); background: var(--bg); color: var(--fg); opacity: 0; visibility: hidden; pointer-events: none; transform: translateY(-8px); transition: opacity .24s ease, transform .24s ease, visibility .24s ease; }
   .nav-links.nav-links--open { opacity: 1; visibility: visible; pointer-events: auto; transform: translateY(0); }
   .nav-links a { color: var(--fg); font-size: clamp(30px, 8vw, 52px); line-height: 1; letter-spacing: -.045em; font-weight: 750; opacity: .82; }
   .nav-links a:hover, .nav-links a:focus-visible { opacity: 1; transform: translateX(5px); }
   .nav-links .theme-switch { margin-top: 12px; transform: scale(1.05); transform-origin: left center; }
-  .nav--menu-open .brand { position: relative; z-index: 120; }
-  .nav--menu-open .nav-menu-toggle { color: var(--fg); }
+  .nav--menu-open .brand { position: relative; z-index: 121; }
+  .nav--menu-open .nav-menu-toggle { position: relative; z-index: 122; color: var(--fg); }
   html.light .nav-links { background: var(--bg); color: var(--fg); }
 }
 @media (prefers-reduced-motion: reduce) {
