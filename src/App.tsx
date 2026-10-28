@@ -23,14 +23,15 @@ export default function App() {
   const currentHudIndexRef = useRef(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const [isDark, setIsDark] = useState<boolean>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('app_theme');
-      if (saved) return saved === 'dark';
-      return true;
-    }
-    return true;
-  });
+  // Keep the server and first client render identical; restore the saved theme after hydration.
+  const [isDark, setIsDark] = useState<boolean>(true);
+  const [themeReady, setThemeReady] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('app_theme');
+    if (saved === 'light' || saved === 'dark') setIsDark(saved === 'dark');
+    setThemeReady(true);
+  }, []);
 
   useEffect(() => {
     if (!isMobileMenuOpen) return;
@@ -52,6 +53,7 @@ export default function App() {
   };
 
   useEffect(() => {
+    if (!themeReady) return;
     const root = document.documentElement;
     if (isDark) {
       root.classList.add('dark');
@@ -61,7 +63,7 @@ export default function App() {
       root.classList.remove('dark');
     }
     localStorage.setItem('app_theme', isDark ? 'dark' : 'light');
-  }, [isDark]);
+  }, [isDark, themeReady]);
 
   // Global 'T' shortcut to toggle theme
   useEffect(() => {
