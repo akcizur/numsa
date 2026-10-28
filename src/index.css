@@ -136,7 +136,7 @@ a {
   position: fixed;
   inset-inline: 0;
   height: var(--edge-size);
-  z-index: 90;
+  z-index: 96;
   pointer-events: none;
   overflow: visible;
 }
