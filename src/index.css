@@ -1878,12 +1878,6 @@ html.light {
 html.light body {
   background: radial-gradient(ellipse at 50% 5%, #fff 0%, #f2f5f8 62%, #eaf0f5 100%);
 }
-html.light .nav {
-  background: rgba(244,247,250,.76);
-  border-bottom: 1px solid rgba(23,33,43,.09);
-  backdrop-filter: blur(18px) saturate(1.2);
-  -webkit-backdrop-filter: blur(18px) saturate(1.2);
-}
 html.light .brand, html.light .nav-links a { color: #17212b; }
 html.light .hero { background: linear-gradient(180deg, rgba(255,255,255,.38), rgba(238,243,248,.18)); }
 html.light .hero h1 { text-shadow: var(--shadow-3d); }
@@ -2204,16 +2198,6 @@ html.light #synthesis .project-route::before { background: linear-gradient(to bo
   transition: transform .18s ease;
 }
 .skip-link:focus { transform: translateY(0); }
-.nav {
-  background: rgba(5, 5, 5, .78);
-  border-bottom: 1px solid rgba(255, 255, 255, .09);
-  backdrop-filter: blur(16px) saturate(1.1);
-  -webkit-backdrop-filter: blur(16px) saturate(1.1);
-}
-html.light .nav {
-  background: rgba(244, 247, 250, .9);
-  border-bottom-color: rgba(23, 33, 43, .12);
-}
 :where(a, button, input, select, textarea, [tabindex]):focus-visible {
   outline: 2px solid #7dd3fc;
   outline-offset: 4px;
@@ -2454,13 +2438,6 @@ html.light {
   --brutal-mid: #666660;
   --brutal-rule: rgba(0,0,0,.22);
 }
-.nav {
-  background: rgba(5,5,5,.94);
-  border-bottom: 1px solid var(--brutal-rule);
-  backdrop-filter: blur(10px) saturate(.7);
-  -webkit-backdrop-filter: blur(10px) saturate(.7);
-}
-html.light .nav { background: rgba(240,240,236,.96); border-bottom-color: var(--brutal-rule); }
 .brand { font-size: 12px; font-weight: 900; letter-spacing: .12em; }
 .nav-links { gap: clamp(12px, 2vw, 26px); }
 .nav-links a { font-size: 10px; letter-spacing: .14em; opacity: .82; }
