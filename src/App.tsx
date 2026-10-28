@@ -442,6 +442,7 @@ export default function App() {
     let currentY = window.scrollY;
     let targetY = currentY;
     let velocity = 0;
+    let scrollMomentum = 0;
     let wheelDeltaRate = 0;
     let lastWheelTime = performance.now();
     let lastFrameTime = performance.now();
@@ -549,6 +550,7 @@ export default function App() {
       targetY = window.scrollY;
       currentY = window.scrollY;
       velocity = 0;
+      scrollMomentum = 0;
       wheelDeltaRate = 0;
     }
 
@@ -578,11 +580,18 @@ export default function App() {
 
       const now = performance.now();
       const dt = Math.max(8, now - lastWheelTime);
-      const instantVelocity = deltaY / dt;
-      wheelDeltaRate = lerp(wheelDeltaRate, instantVelocity, 0.28);
+      if (autoScrollAnimation) {
+        autoScrollAnimation = null;
+        targetY = currentY;
+        scrollMomentum = 0;
+      }
+      // Normalize wheel speed to a 60 Hz frame so rapid gestures feel stronger
+      // on high-refresh displays without making small trackpad gestures jumpy.
+      const instantVelocity = (deltaY / dt) * 16.667;
+      wheelDeltaRate = lerp(wheelDeltaRate, instantVelocity, 0.34);
       lastWheelTime = now;
 
-      const boost = clamp(1 + Math.abs(wheelDeltaRate) * 0.06, 1, 1.32);
+      const boost = clamp(1.06 + Math.abs(wheelDeltaRate) * 0.0048, 1.06, 1.8);
       targetY = clamp(targetY + deltaY * boost, 0, maxScroll);
       isIntertiaActive = true;
       scheduleFrame();
@@ -595,9 +604,10 @@ export default function App() {
         start: currentY,
         end: clampedTarget,
         startTime: performance.now(),
-        duration: clamp(380 + Math.abs(clampedTarget - currentY) * 0.12, 380, 820),
+        duration: clamp(320 + Math.abs(clampedTarget - currentY) * 0.085, 320, 720),
       };
       targetY = clampedTarget;
+      scrollMomentum = 0;
       isIntertiaActive = true;
       scheduleFrame();
     }
@@ -861,9 +871,29 @@ export default function App() {
         targetY = autoScrollAnimation.end;
         if (progress >= 1) autoScrollAnimation = null;
       } else {
-        const decay = 1 - Math.pow(0.00004, dt / 1000);
-        currentY = lerp(currentY, targetY, decay * 0.96);
-        if (Math.abs(targetY - currentY) < 0.08) currentY = targetY;
+        // Mass-and-spring scroll: quick for long flicks, gentle close to rest.
+        // Slightly under-critical damping preserves a tactile inertial glide.
+        const remaining = targetY - currentY;
+        const stiffness = clamp(360 + Math.abs(remaining) * 0.1, 360, 760);
+        const damping = 2 * Math.sqrt(stiffness) * 0.92;
+        const acceleration = remaining * stiffness - scrollMomentum * damping;
+        scrollMomentum += acceleration * (dt / 1000);
+
+        const nextY = currentY + scrollMomentum * (dt / 1000);
+        if (nextY <= 0) {
+          currentY = 0;
+          if (scrollMomentum < 0) scrollMomentum = 0;
+        } else if (nextY >= maxScroll) {
+          currentY = maxScroll;
+          if (scrollMomentum > 0) scrollMomentum = 0;
+        } else {
+          currentY = nextY;
+        }
+
+        if (Math.abs(targetY - currentY) < 0.35 && Math.abs(scrollMomentum) < 5) {
+          currentY = targetY;
+          scrollMomentum = 0;
+        }
       }
 
       const instantVel = isIntertiaActive ? (currentY - window.scrollY) * (1000 / Math.max(1, dt)) : 0;
@@ -878,7 +908,7 @@ export default function App() {
       velocity *= Math.pow(0.8, dt / 16.6667);
       updateParallaxAndEdges(currentY, velocity);
 
-      const hasMomentum = isIntertiaActive && (!!autoScrollAnimation || Math.abs(targetY - currentY) > 0.08 || Math.abs(velocity) > 0.04);
+      const hasMomentum = isIntertiaActive && (!!autoScrollAnimation || Math.abs(targetY - currentY) > 0.35 || Math.abs(scrollMomentum) > 5 || Math.abs(velocity) > 0.04);
 
       if (hasMomentum) {
         scheduleFrame();
@@ -886,6 +916,7 @@ export default function App() {
         isIntertiaActive = false;
         autoScrollAnimation = null;
         velocity = 0;
+        scrollMomentum = 0;
         wheelDeltaRate = 0;
       }
     }
