@@ -2187,7 +2187,7 @@ html.light #synthesis .project-route::before { background: linear-gradient(to bo
 }
 
 
-/* Portfolio polish: keyboard access, readable navigation and intentional CTAs. */
+/* Portfolio polish: keyboard access and intentional CTAs. Navbar stays transparent. */
 .skip-link {
   position: fixed;
   z-index: 1000;
@@ -2204,16 +2204,7 @@ html.light #synthesis .project-route::before { background: linear-gradient(to bo
   transition: transform .18s ease;
 }
 .skip-link:focus { transform: translateY(0); }
-.nav {
-  background: rgba(5, 5, 5, .78);
-  border-bottom: 1px solid rgba(255, 255, 255, .09);
-  backdrop-filter: blur(16px) saturate(1.1);
-  -webkit-backdrop-filter: blur(16px) saturate(1.1);
-}
-html.light .nav {
-  background: rgba(244, 247, 250, .9);
-  border-bottom-color: rgba(23, 33, 43, .12);
-}
+.nav { background: transparent !important; border-bottom: 0 !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
 :where(a, button, input, select, textarea, [tabindex]):focus-visible {
   outline: 2px solid #7dd3fc;
   outline-offset: 4px;
@@ -2313,4 +2304,28 @@ html.light .hero-action--secondary { background: rgba(255, 255, 255, .7); }
 @media (prefers-reduced-motion: reduce) {
   .skip-link, .hero-action { transition: none; }
   .hero-action:hover { transform: none; }
+}
+
+
+/* Transparent navbar + edge-to-edge mobile navigation overlay */
+.nav { background: transparent !important; border: 0 !important; box-shadow: none !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+html.light .nav { background: transparent !important; border: 0 !important; }
+.nav-menu-toggle { display: none; position: relative; z-index: 120; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; color: var(--fg); background: transparent; border: 0; cursor: pointer; }
+.nav-menu-toggle:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+.nav-links--open { visibility: visible; }
+@media (max-width: 760px) {
+  .nav { z-index: 110; }
+  .nav-inner { position: relative; z-index: 111; width: calc(100% - 28px); }
+  .nav-menu-toggle { display: inline-flex; }
+  .nav-links { position: fixed; inset: 0; z-index: 115; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: clamp(18px, 4.5vh, 36px); padding: 88px clamp(28px, 9vw, 64px) 48px; background: var(--bg); color: var(--fg); opacity: 0; visibility: hidden; pointer-events: none; transform: translateY(-8px); transition: opacity .24s ease, transform .24s ease, visibility .24s ease; }
+  .nav-links.nav-links--open { opacity: 1; visibility: visible; pointer-events: auto; transform: translateY(0); }
+  .nav-links a { color: var(--fg); font-size: clamp(30px, 8vw, 52px); line-height: 1; letter-spacing: -.045em; font-weight: 750; opacity: .82; }
+  .nav-links a:hover, .nav-links a:focus-visible { opacity: 1; transform: translateX(5px); }
+  .nav-links .theme-switch { margin-top: 12px; transform: scale(1.05); transform-origin: left center; }
+  .nav--menu-open .brand { position: relative; z-index: 120; }
+  .nav--menu-open .nav-menu-toggle { color: var(--fg); }
+  html.light .nav-links { background: var(--bg); color: var(--fg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nav-links { transition: none !important; }
 }
