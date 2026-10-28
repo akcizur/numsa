@@ -300,6 +300,19 @@ export default function App() {
         }
       });
 
+      // Keep the upper glass blur visibly active while the Projects chapter is on screen.
+      const projectsSection = document.querySelector<HTMLElement>('#synthesis');
+      const topGlassEdge = document.querySelector<HTMLElement>('.edge--top');
+      if (projectsSection && topGlassEdge) {
+        ScrollTrigger.create({
+          trigger: projectsSection,
+          start: 'top 88%',
+          end: 'bottom 12%',
+          onToggle: (self) => topGlassEdge.classList.toggle('edge--projects-active', self.isActive),
+          onRefresh: (self) => topGlassEdge.classList.toggle('edge--projects-active', self.isActive),
+        });
+      }
+
       // Full-window horizontal gallery driven by vertical scroll, with each caption rising through a blurred edge.
       const projectGallery = document.querySelector<HTMLElement>('#synthesis .project-gallery');
       const projectTrack = document.querySelector<HTMLElement>('#synthesis .project-gallery__track');
