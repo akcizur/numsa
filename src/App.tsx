@@ -302,7 +302,10 @@ export default function App() {
       const projectGallery = document.querySelector<HTMLElement>('#synthesis .project-gallery');
       const projectTrack = document.querySelector<HTMLElement>('#synthesis .project-gallery__track');
       const projectPanels = gsap.utils.toArray<HTMLElement>('#synthesis .project-panel');
-      if (projectGallery && projectTrack && projectPanels.length) {
+      // The pinned horizontal scrub is desktop-only. Mobile uses a stable vertical card stack
+      // to avoid address-bar viewport changes shifting pinned ScrollTrigger coordinates.
+      const desktopGallery = window.matchMedia('(min-width: 761px) and (prefers-reduced-motion: no-preference)').matches;
+      if (desktopGallery && projectGallery && projectTrack && projectPanels.length) {
         const horizontalTween = gsap.to(projectTrack, {
           x: () => -(projectTrack.scrollWidth - projectGallery.clientWidth),
           ease: 'none',
