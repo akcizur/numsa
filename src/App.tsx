@@ -48,6 +48,51 @@ export default function App() {
     localStorage.setItem('app_theme', isDark ? 'dark' : 'light');
   }, [isDark]);
 
+  // Pointer-driven parallax is limited to the hero and respects reduced-motion preferences.
+  useEffect(() => {
+    const hero = document.querySelector<HTMLElement>('.hero--brutal');
+    const stage = hero?.querySelector<HTMLElement>('.brutal-depth-stage');
+    if (!hero || !stage) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (!window.matchMedia('(pointer: fine)').matches) return;
+
+    let rafId = 0;
+    let x = 0;
+    let y = 0;
+    const render = () => {
+      rafId = 0;
+      stage.style.setProperty('--depth-x-back', `${x * -10}px`);
+      stage.style.setProperty('--depth-y-back', `${y * -7}px`);
+      stage.style.setProperty('--depth-x-mid', `${x * -22}px`);
+      stage.style.setProperty('--depth-y-mid', `${y * -16}px`);
+      stage.style.setProperty('--depth-x-front', `${x * -38}px`);
+      stage.style.setProperty('--depth-y-front', `${y * -26}px`);
+      stage.style.setProperty('--depth-x-floor', `${x * 14}px`);
+      stage.style.setProperty('--depth-y-floor', `${y * 10}px`);
+      hero.style.setProperty('--brutal-light-x', `${(x + 0.5) * 100}%`);
+      hero.style.setProperty('--brutal-light-y', `${(y + 0.5) * 100}%`);
+    };
+    const onMove = (event: PointerEvent) => {
+      const rect = hero.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      x = Math.max(-0.5, Math.min(0.5, (event.clientX - rect.left) / rect.width - 0.5));
+      y = Math.max(-0.5, Math.min(0.5, (event.clientY - rect.top) / rect.height - 0.5));
+      if (!rafId) rafId = window.requestAnimationFrame(render);
+    };
+    const reset = () => {
+      x = 0;
+      y = 0;
+      if (!rafId) rafId = window.requestAnimationFrame(render);
+    };
+    hero.addEventListener('pointermove', onMove, { passive: true });
+    hero.addEventListener('pointerleave', reset, { passive: true });
+    return () => {
+      hero.removeEventListener('pointermove', onMove);
+      hero.removeEventListener('pointerleave', reset);
+      if (rafId) window.cancelAnimationFrame(rafId);
+    };
+  }, []);
+
   // Global 'T' shortcut to toggle theme
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -1071,7 +1116,7 @@ export default function App() {
       {/* Main Content: Exact original sections, centered, no blopnout */}
       <main id="top" tabIndex={-1}>
         {/* Window 00: Hero Intro */}
-        <section className="hero">
+        <section className="hero hero--brutal" data-depth-scene>
           <div className="parallax-stage" aria-hidden="true">
             <div
               className="parallax-layer parallax-layer--1"
@@ -1090,8 +1135,20 @@ export default function App() {
             />
           </div>
 
+          <div className="brutal-depth-stage" aria-hidden="true">
+            <div className="brutal-coordinate brutal-coordinate--top"><span>FIELD STUDY</span><b>26.10</b></div>
+            <div className="brutal-grid-plane" />
+            <div className="brutal-object brutal-object--rear"><span>STRUCTURE / 01</span></div>
+            <div className="brutal-object brutal-object--main"><span>FORM<br />FOLLOWS<br />FUNCTION.</span></div>
+            <div className="brutal-object brutal-object--cap"><span>DEPTH / 04</span></div>
+            <div className="brutal-cross brutal-cross--a" />
+            <div className="brutal-cross brutal-cross--b" />
+            <div className="brutal-coordinate brutal-coordinate--bottom"><span>DESIGN</span><i /> <span>CODE</span><i /> <span>SPACE</span></div>
+            <div className="brutal-index"><b>01</b><span>SPATIAL<br />INTERFACE</span></div>
+          </div>
+
           <div className="hero-inner" data-parallax="-0.03" data-depth="4">
-            <span className="eyebrow">Webdesigner · UI/UX · Frontend & Creative Development</span>
+            <span className="eyebrow">Design / Code / Spatial Experiments — 2026</span>
             <h1>
               <span className="hero-name">RUZICKAJAKUB</span><span className="hero-domain">.cz</span>
             </h1>
@@ -1107,13 +1164,18 @@ export default function App() {
                 Domluvit spolupráci
               </a>
             </div>
+            <div className="hero-specs" aria-label="Oblasti tvorby">
+              <span><b>01</b> Digital design</span>
+              <span><b>02</b> Frontend systems</span>
+              <span><b>03</b> Interactive 3D</span>
+            </div>
           </div>
         </section>
 
         {/* Demo Sections: Windows 01, 02, 03 */}
         <section className="demo">
           {/* Window 01: BLUR */}
-          <article className="section" id="blur">
+          <article className="section section--brutal" id="blur" data-brutal-index="01">
             <div className="section-photo section-photo--blur" data-parallax="0.16" data-depth="1" aria-hidden="true" />
             <div className="section-grid">
               <div>
@@ -1135,7 +1197,7 @@ export default function App() {
           </article>
 
           {/* Window 02: GRADIENT */}
-          <article className="section" id="gradient">
+          <article className="section section--brutal" id="gradient" data-brutal-index="02">
             <div className="section-photo section-photo--gradient" data-parallax="-0.2" data-depth="2" aria-hidden="true" />
             <div className="section-grid">
               <div>
@@ -1155,7 +1217,7 @@ export default function App() {
           </article>
 
           {/* Window 03: FADE */}
-          <article className="section" id="fade">
+          <article className="section section--brutal" id="fade" data-brutal-index="03">
             <div className="section-photo section-photo--blur" data-parallax="0.16" data-depth="1" aria-hidden="true" />
             <div className="section-grid">
               <div><h2 data-parallax="0.045" data-depth="2">03<br />O MNĚ</h2></div>
@@ -1164,7 +1226,7 @@ export default function App() {
           </article>
 
           {/* Window 04: PORTFOLIO */}
-          <article className="section" id="synthesis">
+          <article className="section section--brutal" id="synthesis" data-brutal-index="04">
             <div className="section-photo section-photo--gradient" data-parallax="-0.18" data-depth="1" aria-hidden="true" />
             <header className="project-intro">
               <span className="eyebrow">04 / VÝBĚR PRÁCE</span>
