@@ -1,25 +1,25 @@
-# Jakub Růžička — Cinematic Portfolio
+# RUZICKAJAKUB.cz
 
-React, TypeScript and Vite portfolio site.
+Osobní portfolio Jakuba Růžičky zaměřené na webdesign, UI/UX a frontend vývoj.
 
-## Local development
+## Lokální spuštění
 
-Requirements: Node.js 20.19+ or 22.12+.
+Požadavky: Bun 1.4.3.
 
 ```sh
-npm install
-npm run dev
+bun install --frozen-lockfile
+bun run dev
 ```
 
-## Build
+## Build a náhled
 
 ```sh
-npm run build
-npm run preview
+bun run build
+bun run preview
 ```
 
 ## GitHub Pages
 
-The site deploys automatically when changes are pushed to the `main` branch. In the repository settings, enable **Pages → Build and deployment → GitHub Actions**. The workflow builds the site and publishes the `dist` directory.
+Každý push do větve `main` spustí GitHub Actions workflow, který sestaví web a nasadí obsah složky `dist`. V nastavení repozitáře musí být **Pages → Build and deployment → GitHub Actions**.
 
-For a project site (`https://<owner>.github.io/<repository>/`), Vite derives the base path from the GitHub Actions repository name. For a user or organization site (`https://<owner>.github.io/`), name the repository `<owner>.github.io`; the build uses the root path.
+U projektového webu (`https://<owner>.github.io/<repository>/`) Vite automaticky použije název repozitáře jako základní cestu. Uživatelský web `<owner>.github.io` používá kořenovou cestu.

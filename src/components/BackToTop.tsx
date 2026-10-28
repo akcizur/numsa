@@ -5,12 +5,7 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { ArrowUp } from 'lucide-react';
-import {
-  shouldShowBackToTop,
-  calculateScrollProgress,
-  calculateProgressOffset,
-  formatScrollPercentage,
-} from '../utils/scrollHelper';
+import { shouldShowBackToTop } from '../utils/scrollHelper';
 
 interface BackToTopProps {
   isDark: boolean;
@@ -19,24 +14,13 @@ interface BackToTopProps {
 
 export const BackToTop: React.FC<BackToTopProps> = ({ isDark, onScrollToTop }) => {
   const [visible, setVisible] = useState(false);
-  const [progress, setProgress] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
-
-  const radius = 22;
-  const circumference = 2 * Math.PI * radius;
-  const strokeOffset = calculateProgressOffset(progress, circumference);
 
   const handleScroll = useCallback(() => {
     const scrollY = window.scrollY;
     const vh = window.innerHeight;
-    const docHeight = document.documentElement.scrollHeight;
-    const maxScroll = Math.max(1, docHeight - vh);
-
     const isPastFirstViewport = shouldShowBackToTop(scrollY, vh, 0.82);
     setVisible(isPastFirstViewport);
-
-    const currentProgress = calculateScrollProgress(scrollY, maxScroll);
-    setProgress(currentProgress);
   }, []);
 
   useEffect(() => {
@@ -53,8 +37,12 @@ export const BackToTop: React.FC<BackToTopProps> = ({ isDark, onScrollToTop }) =
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const activeEl = document.activeElement;
-      if (activeEl && /INPUT|TEXTAREA|SELECT/i.test(activeEl.tagName)) return;
-      if (e.key === 'h' || e.key === 'H') {
+      const isTyping = activeEl instanceof HTMLElement && (
+        activeEl.isContentEditable ||
+        Boolean(activeEl.closest('input, textarea, select, [contenteditable="true"], [role="textbox"]'))
+      );
+      if (isTyping || e.altKey || e.ctrlKey || e.metaKey || e.repeat) return;
+      if (e.key.toLowerCase() === 'h') {
         scrollToTop();
       }
     };
@@ -72,7 +60,7 @@ export const BackToTop: React.FC<BackToTopProps> = ({ isDark, onScrollToTop }) =
 
   return (
     <div
-      className={`fixed bottom-7 right-7 z-[95] transition-all duration-300 ease-out transform ${
+      className={`fixed bottom-7 right-7 z-[9999] transition-all duration-300 ease-out transform ${
         visible
           ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto'
           : 'opacity-0 translate-y-6 scale-90 pointer-events-none'
@@ -83,59 +71,19 @@ export const BackToTop: React.FC<BackToTopProps> = ({ isDark, onScrollToTop }) =
         onClick={scrollToTop}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        className="group relative flex items-center justify-center w-13 h-13 rounded-full bg-[rgba(15,18,25,0.72)] dark:bg-[rgba(10,12,18,0.78)] light:bg-[rgba(255,255,255,0.85)] backdrop-blur-xl border border-white/20 dark:border-white/20 light:border-black/15 shadow-[0_8px_32px_rgba(0,0,0,0.36)] hover:shadow-[0_12px_40px_rgba(6,182,212,0.35)] hover:border-cyan-400/50 active:scale-95 transition-all duration-200 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
-        aria-label={`Zpět na začátek stránky (${formatScrollPercentage(progress)} proscrollováno)`}
-        title={`Reset scroll pozice na apex (Klávesa: H · ${formatScrollPercentage(progress)})`}
+        className="group relative flex items-center justify-center w-13 h-13 rounded-full bg-black/50 dark:bg-black/50 light:bg-white/50 backdrop-blur-xl border border-white/25 dark:border-white/25 light:border-black/20 shadow-[0_8px_32px_rgba(0,0,0,0.24)] hover:bg-black/60 dark:hover:bg-black/60 light:hover:bg-white/60 hover:border-white/40 active:scale-95 transition-all duration-200 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
+        aria-label="Zpět na začátek stránky"
+        title="Zpět na začátek stránky (H)"
       >
-        {/* Fluent acrylic glow ring */}
-        <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-cyan-500/20 via-emerald-500/10 to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none blur-sm" />
-
-        {/* Circular Progress SVG */}
-        <svg
-          className="w-13 h-13 -rotate-90 pointer-events-none"
-          viewBox="0 0 52 52"
-          aria-hidden="true"
-        >
-          {/* Background Track */}
-          <circle
-            cx="26"
-            cy="26"
-            r={radius}
-            fill="none"
-            stroke={isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)'}
-            strokeWidth="2.5"
-          />
-          {/* Animated Progress Stroke */}
-          <circle
-            cx="26"
-            cy="26"
-            r={radius}
-            fill="none"
-            stroke="url(#fluentProgressGradient)"
-            strokeWidth="2.5"
-            strokeDasharray={circumference}
-            strokeDashoffset={strokeOffset}
-            strokeLinecap="round"
-            className="transition-[stroke-dashoffset] duration-150 ease-out"
-          />
-          <defs>
-            <linearGradient id="fluentProgressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#06b6d4" />
-              <stop offset="50%" stopColor="#10b981" />
-              <stop offset="100%" stopColor="#8b5cf6" />
-            </linearGradient>
-          </defs>
-        </svg>
-
-        {/* Icon & Hover Percentage Indicator */}
+        {/* Icon */}
         <div className="absolute inset-0 flex items-center justify-center">
           <ArrowUp
             className={`w-5 h-5 transition-transform duration-200 ${
               isHovered
-                ? '-translate-y-0.5 text-cyan-400 scale-110'
+                ? '-translate-y-0.5 scale-110'
                 : isDark
-                ? 'text-white/90'
-                : 'text-neutral-900'
+                ? 'text-white/80'
+                : 'text-neutral-900/80'
             }`}
           />
         </div>
@@ -146,8 +94,7 @@ export const BackToTop: React.FC<BackToTopProps> = ({ isDark, onScrollToTop }) =
             isHovered ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-2'
           }`}
         >
-          <span className="text-cyan-400 font-bold mr-1.5">{formatScrollPercentage(progress)}</span>
-          <span>APEX ↑ (H)</span>
+          <span>Nahoru ↑ (H)</span>
         </span>
       </button>
     </div>

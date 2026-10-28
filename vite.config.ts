@@ -1,7 +1,10 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
-import {defineConfig} from 'vite';
+import { fileURLToPath } from 'node:url';
+import { defineConfig } from 'vite';
+
+const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig(({ command }) => {
   const repositoryName = process.env.GITHUB_REPOSITORY?.split('/')[1];
@@ -13,9 +16,7 @@ export default defineConfig(({ command }) => {
     base,
     plugins: [react(), tailwindcss()],
     resolve: {
-      alias: {
-        '@': path.resolve(__dirname, '.'),
-      },
+      alias: { '@': projectRoot },
     },
     server: {
       hmr: process.env.DISABLE_HMR !== 'true',

@@ -20,15 +20,14 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: 22
-          cache: npm
+          bun-version: 1.4.3
       - name: Install dependencies
-        run: npm install
+        run: bun install --frozen-lockfile
       - name: Build site
-        run: npm run build
+        run: bun run build
         env:
           GITHUB_REPOSITORY: ${{ github.repository }}
       - name: Configure Pages
